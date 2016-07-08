@@ -1,0 +1,2 @@
+file /Users/sebastianlamm/Documents/work/sampling/parallel/SConstruct,line 90:
+	Configure(confdir = .sconf_temp)
