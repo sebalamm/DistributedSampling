@@ -42,14 +42,12 @@ int parse_parameters(int argn, char **argv,
     struct arg_int *k                              = arg_int0(NULL, "k", NULL, "Base case size");
     struct arg_int *i                              = arg_int0(NULL, "i", NULL, "Number of iterations");
     struct arg_dbl *p                              = arg_dbl0(NULL, "p", NULL, "Sampling probability");
-    struct arg_lit *hash_sample                    = arg_lit0(NULL, "hash_sample", "Use hash sampling");
-    struct arg_lit *master_worker                  = arg_lit0(NULL, "master_worker", "Use dynamic load balancing");
     struct arg_str *output                         = arg_str0(NULL, "output", NULL, "Output filename");
     struct arg_end *end                            = arg_end(100);
 
     // Define argtable.
     void* argtable[] = {
-        help, user_seed, ex_n, ex_N, n, N, i, k, hash_sample, master_worker, output, 
+        help, user_seed, ex_n, ex_N, n, N, i, k, output, 
         end
     };
 
@@ -106,7 +104,7 @@ int parse_parameters(int argn, char **argv,
     }
     
     if (k->count > 0) {
-        config.k = k->ival[0];
+        config.k = pow(2, k->ival[0]);
     }
 
     if (i->count > 0) {

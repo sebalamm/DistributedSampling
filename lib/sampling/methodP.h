@@ -33,48 +33,58 @@
 template <typename Stocc = StochasticLib1, typename LocalSampler = SeqDivideSampling<>, typename H = CRCHash>
 class ParDivideSampling {
     public:
-        ParDivideSampling(SamplingConfig & config, ULONG seed, ULONG size) 
+        ParDivideSampling(SamplingConfig &config, ULONG seed, PEID size) 
             : config(config),
               stocc(seed)
         { 
             // Compute input distribution
-            ULONG rem = config.N % size;
-            ULONG div = config.N / size;
-            N.reserve(size+1);
-            N.push_back(0);
-            for (ULONG i = 1; i <= size; ++i) N.push_back(N[i-1] + div + (i <= rem));
+            rem = config.N % size;
+            div = config.N / size;
+            // N.reserve(size+1);
+            // N.push_back(0);
+            // for (ULONG i = 1; i <= size; ++i) N.push_back(N[i-1] + div + (i <= rem));
         }
 
         template <typename F>
         void sample(ULONG n, 
-                    ULONG j, 
-                    ULONG k, 
-                    ULONG i,
+                    PEID j, 
+                    PEID k, 
+                    PEID i,
                     F &&callback,
                     ULONG offset = 0) {
             if (j - k == 0) {
                 ULONG h = H::hash(config.seed + i);
                 typename LocalSampler::base_type base_sampler(h);
-                // How to get rid of this?
-                base_sampler.resizeTable(N[i+1] - N[i], n);
+                // TODO: How to get rid of this?
+                // base_sampler.resizeTable(N[i+1] - N[i], config.k);
+                base_sampler.resizeTable(N(i+1) - N(i), config.k);
                 LocalSampler local_sampler(base_sampler, config.k, h);
-                local_sampler.sample(N[i+1] - N[i], n, callback, offset);
+                // local_sampler.sample(N[i+1] - N[i], n, callback, offset);
+                local_sampler.sample(N(i+1) - N(i), n, callback, offset);
                 return;
             } 
             
             ULONG m = (j + k) / 2;
             ULONG h = H::hash(config.seed + j + k);
             stocc.RandomInit(h);
-            ULONG N_split = N[m] - N[j-1];
-            ULONG x = stocc.Hypergeometric(N_split, n, N[k] - N[j-1]); 
+            // ULONG N_split = N[m] - N[j-1];
+            ULONG N_split = N(m) - N(j-1);
+            // ULONG x = stocc.Hypergeometric(N_split, n, N[k] - N[j-1]); 
+            ULONG x = stocc.Hypergeometric(N_split, n, N(k) - N(j-1)); 
             if (i < m) sample(x, j, m, i, callback, offset);
             else sample(n-x, m + 1, k, i, callback, offset + N_split);
         }
 
     private:
-        SamplingConfig config;
+        SamplingConfig &config;
         Stocc stocc;
-        std::vector<ULONG> N;
+        // std::vector<ULONG> N;
+        ULONG div;
+        PEID rem;
+
+        inline ULONG N(PEID i) {
+            return i * div + std::min(i, rem);
+        }
 
 };
 

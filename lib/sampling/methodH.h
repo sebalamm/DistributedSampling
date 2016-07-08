@@ -45,7 +45,7 @@ class HashSampling {
             table_size = pow(2, table_lg);
             hash_table.resize(table_size, 0);
             // indices.reserve(table_size);
-
+            
             // Offset for fast indexing
             offset = &(hash_table[0]);
         }
@@ -92,6 +92,7 @@ sample:
             // }
             // Alternative
             memset(offset, 0, sizeof(ULONG)*table_size);
+            // std::fill(hash_table.begin(), hash_table.end(), 0);
         }
 
     private:
