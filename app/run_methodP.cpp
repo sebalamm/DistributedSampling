@@ -22,6 +22,8 @@
 #include <argtable2.h>
 #include <mpi.h>
 
+#include <vector>
+
 #include "timer.h"
 #include "macros_assertions.h"
 #include "parse_parameters.h"
@@ -42,17 +44,20 @@ int main(int argn, char **argv) {
     if (ret_code) { MPI_Finalize(); return 0; }
 
     // Main algorithm
+    FILE *fp;
     if (rank == ROOT) {
         std::cout << "sample (n=" << config.n << 
                               ", N=" << config.N << 
                               ", k=" << config.k << 
                               ", s=" << config.seed << 
                               ", p=" << size << ")" << std::endl;
+        std::string filename = config.output_file;
+        fp = fopen(filename.c_str(), "w+");
     }
     
-    // Output
-    std::string filename = config.output_file + std::to_string(rank);
-    FILE *fp = fopen(filename.c_str(), "w+");
+    // Resulting samples
+    std::vector<ULONG> sample;
+    sample.reserve(config.n);
 
     // Timers
     timer t;
@@ -64,14 +69,16 @@ int main(int argn, char **argv) {
                1,
                size,
                rank,
-               [&](ULONG sample) {
-                   fprintf(fp, "%lld\n", sample);
+               [&](ULONG elem) {
+                   // fprintf(fp, "%lld\n", elem);
+                   sample.push_back(elem);
                });
 
-    if (rank == ROOT)
-        std::cout << "total time taken " << t.elapsed() << std::endl;
-
-    fclose(fp);
+    if (rank == ROOT) {
+        std::cout << "total time " << t.elapsed() << std::endl;
+        fprintf(fp, "total time %f", t.elapsed());
+        fclose(fp);
+    }
 
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
