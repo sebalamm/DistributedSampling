@@ -44,7 +44,7 @@ class HashSampling {
             // Table size
             table_size = pow(2, table_lg);
             hash_table.resize(table_size, 0);
-            // indices.reserve(table_size);
+            indices.reserve(table_size);
             
             // Offset for fast indexing
             offset = &(hash_table[0]);
@@ -80,25 +80,30 @@ increment:
 sample:
                 // Add sample
                 *(offset + index) = variate;
-                // indices.push_back(index);
+                indices.push_back(index);
                 callback(variate);
                 n--;
             }
+        }
 
-            // Clear table
-            // while (!indices.empty()) {
-            //     hash_table[indices.back()] = 0;
-            //     indices.pop_back();
-            // }
+        bool isEmpty() {
+            return indices.empty();
+        }
+
+        void clear() {
+            while (!indices.empty()) {
+                hash_table[indices.back()] = 0;
+                indices.pop_back();
+            }
             // Alternative
-            memset(offset, 0, sizeof(ULONG)*table_size);
+            // memset(offset, 0, sizeof(ULONG)*table_size);
             // std::fill(hash_table.begin(), hash_table.end(), 0);
         }
 
     private:
         RandomGenerator gen;
 
-        // std::vector<ULONG> indices;
+        std::vector<ULONG> indices;
         std::vector<ULONG> hash_table;
         ULONG table_size;
         ULONG address_mask;
