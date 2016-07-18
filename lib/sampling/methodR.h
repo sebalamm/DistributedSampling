@@ -29,7 +29,7 @@
 #include "sampling/methodD.h"
 #include "sampling/methodH.h"
 
-template <typename Stocc = StochasticLib1, typename BaseSampler = Vitter<>>
+template <typename Stocc = StochasticLib1, typename BaseSampler = HashSampling<>>
 class SeqDivideSampling {
     public:
         typedef BaseSampler base_type;
