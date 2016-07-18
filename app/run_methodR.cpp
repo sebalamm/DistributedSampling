@@ -66,7 +66,7 @@ int main(int argn, char **argv) {
     // Compute sample
     // Vitter<> hs(config.seed);
     HashSampling<> hs(config.seed);
-    hs.resizeTable(config.N, config.n);
+    hs.resizeTable(config.N / config.n * config.k, config.k);
     SeqDivideSampling<> sds(hs, config.k, config.seed);
     sds.sample(config.N,
                config.n,

@@ -42,7 +42,7 @@ class HashSampling {
             address_mask = LOG2(N) - table_lg;
 
             // Table size
-            table_size = pow(2, table_lg);
+            table_size = ipow(2, table_lg);
             hash_table.resize(table_size, 0);
             indices.reserve(table_size);
             
@@ -110,6 +110,16 @@ sample:
         ULONG table_size;
         ULONG address_mask;
         ULONG *offset;
+
+        ULONG ipow(ULONG base, ULONG exp) {
+            ULONG result = 1;
+            while (exp) {
+                if (exp & 1) result *= base;
+                exp >>= 1;
+                base *= base;
+            }
+            return result;
+        }
 };
 
 #endif 
