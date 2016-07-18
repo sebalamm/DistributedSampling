@@ -73,6 +73,7 @@ int main(int argn, char **argv) {
               });
 
     if (rank == ROOT) {
+        std::cout << "sampled " << sample.size() << " elements" << std::endl;
         std::cout << "total time " << t.elapsed() << std::endl;
         fprintf(fp, "total time %f", t.elapsed());
         fclose(fp);
