@@ -74,9 +74,12 @@ int main(int argn, char **argv) {
                    sample.push_back(elem);
                });
 
+    double time_taken = t.elapsed();
+    double max_time_taken = 0.0;
+    MPI_Reduce(&time_taken, &max_time_taken, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
     if (rank == ROOT) {
-        std::cout << "total time " << t.elapsed() << std::endl;
-        fprintf(fp, "total time %f", t.elapsed());
+        std::cout << "total time " << max_time_taken << std::endl;
+        fprintf(fp, "total time %f", max_time_taken);
         fclose(fp);
     }
 
