@@ -55,7 +55,9 @@ if env['program'] == 'library':
         'extern/stocc64/stoc2.cpp',
         'extern/stocc64/stoc3.cpp',
         'extern/stocc64/wnchyppr.cpp',
-        'extern/stocc64/fnchyppr.cpp'
+        'extern/stocc64/fnchyppr.cpp',
+        'extern/spooky/spooky.cpp',
+        'extern/city/city.cc'
     ])
 
 if env['program'] == 'run_methodD':
