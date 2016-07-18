@@ -35,9 +35,9 @@ struct SamplingConfig {
     ULONG n;
     // Size of population
     ULONG N;
-    // Chunk size
+    // Base case size
     ULONG k;
-    // Sample probability
+    // Sample probability (bernoulli)
     double p;
     // Output filename
     std::string output_file;

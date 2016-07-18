@@ -84,6 +84,8 @@ sample:
                 callback(variate);
                 n--;
             }
+
+            clear();
         }
 
         bool isEmpty() {

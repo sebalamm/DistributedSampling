@@ -10,5 +10,5 @@ POPULATION=52
 BASE=10
 SEEDS=3
 
-# GNM
+# TODO Bad weak scaling comes from base case sampling
 python3 weak_scaling.py -f "output/$OUTPUT" -P ${PE[*]} -n $SAMPLE -N $POPULATION -k $BASE -s $SEEDS 

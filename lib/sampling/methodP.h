@@ -52,7 +52,9 @@ class ParDivideSampling {
             if (j - k == 0) {
                 ULONG h = H::hash(config.seed + i);
                 typename LocalSampler::base_type base_sampler(h);
-                base_sampler.resizeTable(N(i+1) - N(i), n);
+                // Allocate hash table for base case
+                // base_sampler.resizeTable(N(i+1) - N(i), n);
+
                 LocalSampler local_sampler(base_sampler, config.k, h);
                 local_sampler.sample(N(i+1) - N(i), n, callback, offset);
                 return;

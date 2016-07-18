@@ -29,7 +29,7 @@
 #include "sampling/methodD.h"
 #include "sampling/methodH.h"
 
-template <typename Stocc = StochasticLib1, typename BaseSampler = HashSampling<>>
+template <typename Stocc = StochasticLib1, typename BaseSampler = Vitter<>>
 class SeqDivideSampling {
     public:
         typedef BaseSampler base_type;
@@ -46,7 +46,6 @@ class SeqDivideSampling {
                     F &&callback,
                     ULONG offset = 0) {
             if (n <= base_size) {
-                if (!base_sampler.isEmpty()) base_sampler.clear();
                 base_sampler.sample(N, n, [&](ULONG sample) { callback(sample + offset); });
                 return;
             } 

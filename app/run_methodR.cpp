@@ -64,8 +64,9 @@ int main(int argn, char **argv) {
     t.restart();
 
     // Compute sample
-    HashSampling<> hs(config.seed);
-    hs.resizeTable(config.N, config.n);
+    Vitter<> hs(config.seed);
+    // HashSampling<> hs(config.seed);
+    // hs.resizeTable(config.N, config.n);
     SeqDivideSampling<> sds(hs, config.k, config.seed);
     sds.sample(config.N,
                config.n,
