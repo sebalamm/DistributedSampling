@@ -50,14 +50,14 @@ class Vitter {
 
             // Initialization
             ULONG sample = 0;
-            double Nreal = (double) N;
-            double top = Nreal - n;
+            float Nreal = (float) N;
+            float top = Nreal - n;
 
             // Main loop
             while (n >= 2) {
                 ULONG S = 0;
-                double V = gen.Random();
-                double quot = top / Nreal;
+                float V = gen.Random();
+                float quot = top / Nreal;
                 while (quot > V) {
                     S++; 
                     top -= 1.0;
@@ -96,24 +96,24 @@ class Vitter {
             // Initialization
             ULONG sample = 0;
             // ULONG num_sample = 0;
-            double nreal = (double) n; 
-            double ninv = 1.0 / nreal; 
-            double Nreal = (double) N;
-            double Vprime = exp(log(gen.Random()) * ninv);
+            float nreal = (float) n; 
+            float ninv = 1.0 / nreal; 
+            float Nreal = (float) N;
+            float Vprime = exp(log(gen.Random()) * ninv);
             ULONG qu1 = N + 1 - n; 
-            double qu1real = Nreal + 1.0 - nreal;
+            float qu1real = Nreal + 1.0 - nreal;
             ULONG negalphainv = -13; 
             ULONG threshold = n * (-negalphainv);
             ULONG S = 0;
 
             // Main loop
             while (n > 1 && threshold < N) {
-                double nmin1inv = 1.0 / (nreal - 1.0);
-                double negSreal = 0.0;
+                float nmin1inv = 1.0 / (nreal - 1.0);
+                float negSreal = 0.0;
 
                 while (true) {
                     // Step D2: Generate U and X
-                    double X;
+                    float X;
                     while (true) {
                         X = Nreal * (1.0 - Vprime); 
                         S = X;
