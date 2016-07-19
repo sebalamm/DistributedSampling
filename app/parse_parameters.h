@@ -93,7 +93,8 @@ int parse_parameters(int argn, char **argv,
         if (ex_n->count > 0)
             config.n = n->ival[0];
         else
-            config.n = pow(10,n->ival[0]);
+            // config.n = pow(10,n->ival[0]);
+            config.n = pow(2,n->ival[0]);
     }
 
     if (N->count > 0) {
