@@ -121,18 +121,18 @@ class Vitter {
                         Vprime = exp(log(gen.Random()) * ninv);
                     }
 
-                    double U = gen.Random(); 
-                    negSreal = -(double)S;
+                    float U = gen.Random(); 
+                    negSreal = -(float)S;
 
                     // Step D3: Accept?
-                    double y1 = exp(log(U * Nreal / qu1real) * nmin1inv);
+                    float y1 = exp(log(U * Nreal / qu1real) * nmin1inv);
                     Vprime = y1 * (-X / Nreal + 1.0) * (qu1real / (negSreal + qu1real));
                     if (Vprime <= 1.0) break; // Accept!
 
                     // Step D4: Accept?
-                    double y2 = 1.0; double top = Nreal - 1.0;
-                    double bottom;
-                    double limit;
+                    float y2 = 1.0; float top = Nreal - 1.0;
+                    float bottom;
+                    float limit;
                     if (n - 1 > S) {
                         bottom = Nreal - nreal; 
                         limit = N - S;

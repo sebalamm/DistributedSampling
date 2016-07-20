@@ -99,8 +99,8 @@ env.Append(CXXFLAGS = '-fopenmp')
 
 # Apply variant specific settings.
 if env['variant'] == 'optimized':
-    env.Append(CXXFLAGS = '-DNDEBUG -Wall -funroll-loops -fno-stack-limit -O3 -std=c++0x -Wall -Wno-literal-suffix -msse4.2 -ffast-math')
-    env.Append(CCFLAGS  = '-O3 -DNDEBUG -funroll-loops -ffast-math')
+    env.Append(CXXFLAGS = '-DNDEBUG -Wall -march=native -mavx2 -fno-stack-limit -O3 -g -std=c++0x -Wall -Wno-literal-suffix -msse4.2 -ffast-math')
+    env.Append(CCFLAGS  = '-DNDEBUG -march=native -mavx2 -O3 -g -ffast-math')
 
 elif env['variant'] == 'debug':
 # A little bit more output on the console
