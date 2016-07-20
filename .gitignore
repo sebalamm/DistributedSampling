@@ -27,3 +27,12 @@
 *.exe
 *.out
 *.app
+
+# Builds
+deploy
+optimized
+debug
+config.log
+
+# Outputs
+*.pdf
