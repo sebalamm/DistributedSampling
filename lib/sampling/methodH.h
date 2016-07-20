@@ -59,26 +59,24 @@ class HashSampling {
             ULONG variate, index, hash_elem;
             while (n > 0) {
                 while (true) {
-variate:
                     // Take sample
                     variate = N * gen.Random() + 1;
                     index = variate >> address_mask; 
                     hash_elem = *(offset + index);    
 
                     // Table lookup
-                    if (likely(hash_elem == 0)) goto sample; // done
+                    if (likely(hash_elem == 0)) break; // done
                     else if (hash_elem == variate) continue; // already sampled
                     else {
 increment:
                         ++index;
                         if (unlikely(index >= table_size)) index = 0; // restart probing
                         hash_elem = *(offset + index); 
-                        if (hash_elem == 0) goto sample; // done 
+                        if (hash_elem == 0) break; // done 
                         else if (hash_elem == variate) continue; // already sampled
                         goto increment; // keep incrementing
                     }
                 }
-sample:
                 // Add sample
                 *(offset + index) = variate;
                 indices.push_back(index);

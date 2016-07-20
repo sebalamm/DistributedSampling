@@ -36,7 +36,7 @@ class SeqDivideSampling {
 
         SeqDivideSampling(BaseSampler &base_sampler, ULONG base_size, ULONG seed) 
             : stocc(seed),
-              base_sampler(base_sampler),
+              base_sampler(std::move(base_sampler)),
               base_size(base_size)
         { }
 
@@ -59,7 +59,7 @@ class SeqDivideSampling {
 
     private:
         Stocc stocc;
-        BaseSampler &base_sampler;
+        BaseSampler base_sampler;
         ULONG base_size;
 };
 
