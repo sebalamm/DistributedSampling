@@ -29,6 +29,7 @@
 
 #define LOG2(X) ((unsigned) (8*sizeof (unsigned long long) - __builtin_clzll((X)) - 1))
 #define unlikely(x) __builtin_expect((x),0)
+#define likely(x) __builtin_expect((x),1)
 
 template <typename RandomGenerator = CRandomMersenne>
 class HashSampling {
@@ -65,15 +66,15 @@ variate:
                     hash_elem = *(offset + index);    
 
                     // Table lookup
-                    if (hash_elem == 0) goto sample; // done
-                    else if (hash_elem == variate) goto variate; // already sampled
+                    if (likely(hash_elem == 0)) goto sample; // done
+                    else if (hash_elem == variate) continue; // already sampled
                     else {
 increment:
-                        index = ++index;
+                        ++index;
                         if (unlikely(index >= table_size)) index = 0; // restart probing
                         hash_elem = *(offset + index); 
                         if (hash_elem == 0) goto sample; // done 
-                        else if (hash_elem == variate) goto variate; // already sampled
+                        else if (hash_elem == variate) continue; // already sampled
                         goto increment; // keep incrementing
                     }
                 }
@@ -93,10 +94,8 @@ sample:
         }
 
         void clear() {
-            while (!indices.empty()) {
-                hash_table[indices.back()] = 0;
-                indices.pop_back();
-            }
+            for (ULONG index : indices) hash_table[index] = 0; 
+            indices.clear();
             // Alternative
             // memset(offset, 0, sizeof(ULONG)*table_size);
             // std::fill(hash_table.begin(), hash_table.end(), 0);
