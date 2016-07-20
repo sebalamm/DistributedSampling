@@ -26,17 +26,21 @@
 #include <vector>
 #include "definitions.h"
 #include "randomc.h"
+#include "dSFMT.h"
 
 #define LOG2(X) ((unsigned) (8*sizeof (unsigned long long) - __builtin_clzll((X)) - 1))
 #define unlikely(x) __builtin_expect((x),0)
 #define likely(x) __builtin_expect((x),1)
 
-template <typename RandomGenerator = CRandomMersenne>
+template <typename RandomGenerator = CRandomMersenne, ULONG blocksize = (1 << 24)>
 class HashSampling {
     public:
         HashSampling(ULONG seed) 
-            : gen(seed) 
-        { }
+            : gen(seed)
+        { 
+            // Modification: dSFMT
+            dsfmt_init_gen_rand(&dsfmt, seed);
+        }
 
         void resizeTable(ULONG N, ULONG n) {
             ULONG table_lg = 3 + LOG2(n);
@@ -57,10 +61,29 @@ class HashSampling {
                     ULONG n, 
                     F &&callback) {
             ULONG variate, index, hash_elem;
+
+            // Modification: dSFMT
+            ULONG curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
+            double *randblock = new double[curr_blocksize];
+            dsfmt_fill_array_open_close(&dsfmt, randblock, curr_blocksize);
+            ULONG array_index = 0;
+            // Modification: End
+
             while (n > 0) {
                 while (true) {
                     // Take sample
-                    variate = N * gen.Random() + 1;
+  
+                    // Modification: dSFMT
+                    if (array_index >= curr_blocksize) {
+                        curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
+                        delete[] randblock; randblock = new double[curr_blocksize];
+                        dsfmt_fill_array_open_close(&dsfmt, randblock, curr_blocksize);
+                        array_index = 0;
+                    }
+                    variate = N * randblock[array_index++] + 1;
+                    // Modification: End
+                    
+                    // variate = N * gen.Random() + 1;
                     index = variate >> address_mask; 
                     hash_elem = *(offset + index);    
 
@@ -101,6 +124,7 @@ increment:
 
     private:
         RandomGenerator gen;
+        dsfmt_t dsfmt;
 
         std::vector<ULONG> indices;
         std::vector<ULONG> hash_table;

@@ -64,7 +64,8 @@ if env['program'] == 'library':
         'extern/stocc/wnchyppr.cpp',
         'extern/stocc/fnchyppr.cpp',
         'extern/spooky/spooky.cpp',
-        'extern/city/city.cc'
+        'extern/city/city.cc',
+        'extern/dSFMT/dSFMT.c'
     ])
 
 if env['program'] == 'run_methodD':
