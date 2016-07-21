@@ -29,6 +29,7 @@
 #include "dSFMT.h"
 
 #define LOG2(X) ((unsigned) (8*sizeof (unsigned long long) - __builtin_clzll((X)) - 1))
+// #define LOG2(X) ((unsigned) (8*sizeof (unsigned long long) - __builtin_clzll((X)) - 1))
 #define unlikely(x) __builtin_expect((x),0)
 #define likely(x) __builtin_expect((x),1)
 
@@ -77,7 +78,7 @@ class HashSampling {
                     if (array_index >= curr_blocksize) {
                         curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
                         delete[] randblock; randblock = new double[curr_blocksize];
-                        dsfmt_fill_array_open_close(&dsfmt, randblock, curr_blocksize);
+                        dsfmt_fill_array_close_open(&dsfmt, randblock, curr_blocksize);
                         array_index = 0;
                     }
                     variate = N * randblock[array_index++] + 1;
