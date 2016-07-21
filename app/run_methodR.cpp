@@ -20,7 +20,6 @@
  *****************************************************************************/
 
 #include <argtable2.h>
-#include <mpi.h>
 
 #include <vector>
 
@@ -31,29 +30,20 @@
 #include "sampling/methodR.h"
 
 int main(int argn, char **argv) {
-    // Init MPI
-    MPI_Init(&argn, &argv);    
-    PEID rank, size;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-
     // Read command-line args
     SamplingConfig config;
     int ret_code = parse_parameters(argn, argv, 
                                     config); 
-    if (ret_code) { MPI_Finalize(); return 0; }
+    if (ret_code) return 0;
 
     // Main algorithm
     FILE *fp;
-    if (rank == ROOT) {
-        std::cout << "sample (n=" << config.n << 
-                              ", N=" << config.N << 
-                              ", k=" << config.k << 
-                              ", s=" << config.seed << 
-                              ", p=" << size << ")" << std::endl;
-        std::string filename = config.output_file;
-        fp = fopen(filename.c_str(), "w+");
-    }
+    std::cout << "sample (n=" << config.n << 
+                          ", N=" << config.N << 
+                          ", k=" << config.k << 
+                          ", s=" << config.seed << ")" << std::endl;
+    std::string filename = config.output_file;
+    fp = fopen(filename.c_str(), "w+");
 
     // Resulting samples
     std::vector<ULONG> sample;
@@ -64,7 +54,6 @@ int main(int argn, char **argv) {
     t.restart();
 
     // Compute sample
-    // Vitter<> hs(config.seed);
     HashSampling<> hs(config.seed);
     hs.resizeTable(config.N / config.n * config.k, config.k);
     SeqDivideSampling<> sds(hs, config.k, config.seed);
@@ -75,13 +64,9 @@ int main(int argn, char **argv) {
                    sample.push_back(elem);
                });
 
-    if (rank == ROOT) {
-        std::cout << "sampled " << sample.size() << " elements" << std::endl;
-        std::cout << "total time " << t.elapsed() << std::endl;
-        fprintf(fp, "total time %f", t.elapsed());
-        fclose(fp);
-    }
-
-    MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Finalize();
+    std::cout << "sampled " << sample.size() << " elements" << std::endl;
+    std::cout << "total time " << t.elapsed() << std::endl;
+    fprintf(fp, "total time %f", t.elapsed());
+    fclose(fp);
 }
+
