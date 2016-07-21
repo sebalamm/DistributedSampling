@@ -36,7 +36,7 @@ template <typename RandomGenerator = CRandomMersenne, ULONG blocksize = (1 << 24
 class HashSampling {
     public:
         HashSampling(ULONG seed) 
-            : gen(seed)
+            // : gen(seed)
         { 
             // Modification: dSFMT
             dsfmt_init_gen_rand(&dsfmt, seed);
@@ -123,7 +123,7 @@ increment:
         }
 
     private:
-        RandomGenerator gen;
+        // RandomGenerator gen;
         dsfmt_t dsfmt;
 
         std::vector<ULONG> indices;
