@@ -82,7 +82,7 @@ int main(int argn, char **argv) {
 
     ULONG samples = sample.size();
     ULONG total_samples = 0;
-    MPI_Reduce(&samples, &total_samples, 1, MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&samples, &total_samples, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
     if (rank == ROOT) {
         std::cout << "sampled " << total_samples << " elements" << std::endl;
