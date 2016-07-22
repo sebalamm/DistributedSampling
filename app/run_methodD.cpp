@@ -60,7 +60,7 @@ int main(int argn, char **argv) {
         sample.clear();
 
         // Compute sample
-        Vitter<> vi(config.seed);
+        Vitter<> vi(config.seed + iteration);
         vi.sample(config.N,
                   config.n,
                   [&](ULONG elem) {
@@ -75,7 +75,7 @@ int main(int argn, char **argv) {
         t.restart();
 
         // Compute sample
-        Vitter<> vi(config.seed);
+        Vitter<> vi(config.seed + iteration);
         vi.sample(config.N,
                   config.n,
                   [&](ULONG elem) {

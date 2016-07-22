@@ -60,8 +60,8 @@ int main(int argn, char **argv) {
         sample.clear();
 
         // Compute sample
-        HashSampling<> hs(config.seed, config.k);
-        SeqDivideSampling<> sds(hs, config.k, config.seed);
+        HashSampling<> hs(config.seed + iteration, config.k);
+        SeqDivideSampling<> sds(hs, config.k, config.seed + iteration);
         sds.sample(config.N,
                    config.n,
                    [&](ULONG elem) {
@@ -76,8 +76,8 @@ int main(int argn, char **argv) {
         t.restart();
 
         // Compute sample
-        HashSampling<> hs(config.seed, config.k);
-        SeqDivideSampling<> sds(hs, config.k, config.seed);
+        HashSampling<> hs(config.seed + iteration, config.k);
+        SeqDivideSampling<> sds(hs, config.k, config.seed + iteration);
         sds.sample(config.N,
                    config.n,
                    [&](ULONG elem) {

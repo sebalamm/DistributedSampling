@@ -37,6 +37,7 @@ class ParDivideSampling {
         ParDivideSampling(SamplingConfig &config, ULONG seed, PEID size) 
             : config(config),
               stocc(seed)
+              hash_seed(seed)
         { 
             // Compute input distribution
             rem = config.N % size;
@@ -51,7 +52,7 @@ class ParDivideSampling {
                     F &&callback,
                     ULONG offset = 0) {
             if (j - k == 0) {
-                ULONG h = H::hash(config.seed + i);
+                ULONG h = H::hash(hash_seed + i);
                 typename LocalSampler::base_type base_sampler(h, config.k);
                 // Allocate hash table for base case
 
@@ -61,7 +62,7 @@ class ParDivideSampling {
             } 
             
             ULONG m = (j + k) / 2;
-            ULONG h = H::hash(config.seed + j + k);
+            ULONG h = H::hash(hash_seed + j + k);
             stocc.RandomInit(h);
             ULONG N_split = N(m) - N(j-1);
             // TODO: Merge hashing with random variates to reduce initialization overhead
@@ -73,6 +74,7 @@ class ParDivideSampling {
     private:
         SamplingConfig &config;
         Stocc stocc;
+        ULONG hash_seed;
         ULONG div;
         PEID rem;
 
