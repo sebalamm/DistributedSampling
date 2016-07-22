@@ -54,8 +54,7 @@ int main(int argn, char **argv) {
     t.restart();
 
     // Compute sample
-    HashSampling<> hs(config.seed);
-    hs.resizeTable(config.N, config.n);
+    HashSampling<> hs(config.seed, config.n);
     hs.sample(config.N,
               config.n,
               [&](ULONG elem) {

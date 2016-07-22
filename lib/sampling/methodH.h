@@ -36,18 +36,17 @@
 template <typename RandomGenerator = CRandomMersenne, ULONG blocksize = (1 << 24)>
 class HashSampling {
     public:
-        HashSampling(ULONG seed) 
+        HashSampling(ULONG seed, ULONG n) 
             // : gen(seed)
         { 
             // Modification: dSFMT
             dsfmt_init_gen_rand(&dsfmt, seed);
+            resizeTable(n);
         }
 
-        void resizeTable(ULONG N, ULONG n) {
-            ULONG table_lg = 3 + LOG2(n);
-            address_mask = LOG2(N) - table_lg;
-
+        void resizeTable(ULONG n) {
             // Table size
+            table_lg = 3 + LOG2(n);
             table_size = ipow(2, table_lg);
             hash_table.resize(table_size, 0);
             indices.reserve(table_size);
@@ -62,6 +61,7 @@ class HashSampling {
                     ULONG n, 
                     F &&callback) {
             ULONG variate, index, hash_elem;
+            ULONG address_mask = LOG2(N) - table_lg + 1;
 
             // Modification: dSFMT
             ULONG curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
@@ -81,10 +81,10 @@ class HashSampling {
                         dsfmt_fill_array_close_open(&dsfmt, randblock, curr_blocksize);
                         array_index = 0;
                     }
-                    variate = N * randblock[array_index++] + 1;
+                    variate = N * randblock[array_index++];
                     // Modification: End
                     
-                    // variate = N * gen.Random() + 1;
+                    // variate = N * gen.Random();
                     index = variate >> address_mask; 
                     hash_elem = *(offset + index);    
 
@@ -104,7 +104,7 @@ increment:
                 // Add sample
                 *(offset + index) = variate;
                 indices.push_back(index);
-                callback(variate);
+                callback(variate+1);
                 n--;
             }
 
@@ -129,8 +129,7 @@ increment:
 
         std::vector<ULONG> indices;
         std::vector<ULONG> hash_table;
-        ULONG table_size;
-        ULONG address_mask;
+        ULONG table_lg, table_size;
         ULONG *offset;
 
         ULONG ipow(ULONG base, ULONG exp) {

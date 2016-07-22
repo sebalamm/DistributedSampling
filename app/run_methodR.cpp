@@ -54,8 +54,7 @@ int main(int argn, char **argv) {
     t.restart();
 
     // Compute sample
-    HashSampling<> hs(config.seed);
-    hs.resizeTable(1.2 * config.N / config.n * config.k, config.k);
+    HashSampling<> hs(config.seed, config.k);
     SeqDivideSampling<> sds(hs, config.k, config.seed);
     sds.sample(config.N,
                config.n,
