@@ -36,7 +36,7 @@ class ParDivideSampling {
     public:
         ParDivideSampling(SamplingConfig &config, ULONG seed, PEID size) 
             : config(config),
-              stocc(seed)
+              stocc(seed),
               hash_seed(seed)
         { 
             // Compute input distribution
