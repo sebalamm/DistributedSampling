@@ -30,8 +30,12 @@
 
 #define LOG2(X) ((unsigned) (8*sizeof (unsigned long long) - __builtin_clzll((X)) - 1))
 // #define LOG2(X) ((unsigned) (8*sizeof (unsigned long long) - __builtin_clzll((X)) - 1))
+#ifndef unlikely
 #define unlikely(x) __builtin_expect((x),0)
+#endif
+#ifndef likely
 #define likely(x) __builtin_expect((x),1)
+#endif
 
 template <typename RandomGenerator = CRandomMersenne, ULONG blocksize = (1 << 24)>
 class HashSampling {

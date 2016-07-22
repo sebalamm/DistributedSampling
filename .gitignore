@@ -33,6 +33,8 @@ deploy
 optimized
 debug
 config.log
+.sconsign.dblite
 
 # Outputs
 *.pdf
+tmp
