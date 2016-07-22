@@ -91,10 +91,7 @@ int main(int argn, char **argv) {
               << " time=" << stats.avg()
               << " stddev=" << stats.stddev()
               << " iterations=" << config.iterations << std::endl;
-
-    // std::cout << "sampled " << sample.size() << " elements" << std::endl;
-    // std::cout << "total time " << t.elapsed() << std::endl;
-    // fprintf(fp, "total time %f", t.elapsed());
+    fprintf(fp, "RESULT runner=H time=%f stddev=%f iterations=%d\n", stats.avg(), stats.stddev(), config.iterations);
     fclose(fp);
 }
 
