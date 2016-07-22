@@ -28,6 +28,7 @@
 #include "parse_parameters.h"
 #include "sampling_config.h"
 #include "sampling/methodH.h"
+#include "tools/benchmark.h"
 
 int main(int argn, char **argv) {
     // Read command-line args
@@ -41,7 +42,8 @@ int main(int argn, char **argv) {
     std::cout << "sample (n=" << config.n << 
                           ", N=" << config.N << 
                           ", k=" << config.k << 
-                          ", s=" << config.seed << ")" << std::endl;
+                          ", s=" << config.seed <<
+                          ", i=" << config.iterations << ")" << std::endl;
     std::string filename = config.output_file;
     fp = fopen(filename.c_str(), "w+");
     
@@ -49,22 +51,50 @@ int main(int argn, char **argv) {
     std::vector<ULONG> sample;
     sample.reserve(config.n);
 
-    // Timers
+    // Statistics
     timer t;
-    t.restart();
+    statistics stats;
 
-    // Compute sample
-    HashSampling<> hs(config.seed, config.n);
-    hs.sample(config.N,
-              config.n,
-              [&](ULONG elem) {
-                  // fprintf(fp, "%lld\n", elem);
-                  sample.push_back(elem);
-              });
+    std::cout << "warmup" << std::endl;
+    for (ULONG iteration = 0; iteration < 100; ++iteration) {
+        sample.clear();
 
-    std::cout << "sampled " << sample.size() << " elements" << std::endl;
-    std::cout << "total time " << t.elapsed() << std::endl;
-    fprintf(fp, "total time %f", t.elapsed());
+        // Compute sample
+        HashSampling<> hs(iteration, config.n);
+        hs.sample(config.N,
+                  config.n,
+                  [&](ULONG elem) {
+                      // fprintf(fp, "%lld\n", elem);
+                      sample.push_back(elem);
+                  });
+    }
+
+    std::cout << "measurements" << std::endl;
+    for (ULONG iteration = 0; iteration < config.iterations; ++iteration) {
+        sample.clear();
+        t.restart();
+
+        // Compute sample
+        HashSampling<> hs(iteration, config.n);
+        hs.sample(config.N,
+                  config.n,
+                  [&](ULONG elem) {
+                      // fprintf(fp, "%lld\n", elem);
+                      sample.push_back(elem);
+                  });
+
+        double time = t.elapsed();
+        stats.push(time);    
+    }
+
+    std::cout << "RESULT runner=H" 
+              << " time=" << stats.avg()
+              << " stddev=" << stats.stddev()
+              << " iterations=" << config.iterations << std::endl;
+
+    // std::cout << "sampled " << sample.size() << " elements" << std::endl;
+    // std::cout << "total time " << t.elapsed() << std::endl;
+    // fprintf(fp, "total time %f", t.elapsed());
     fclose(fp);
 }
 
