@@ -29,6 +29,7 @@
 #include "parse_parameters.h"
 #include "sampling_config.h"
 #include "sampling/methodP.h"
+#include "tools/benchmark.h"
 
 int main(int argn, char **argv) {
     // Init MPI
@@ -50,6 +51,7 @@ int main(int argn, char **argv) {
                               ", N=" << config.N << 
                               ", k=" << config.k << 
                               ", s=" << config.seed << 
+                              ", i=" << config.iterations << 
                               ", p=" << size << ")" << std::endl;
         std::string filename = config.output_file;
         fp = fopen(filename.c_str(), "w+");
@@ -61,33 +63,55 @@ int main(int argn, char **argv) {
 
     // Timers
     timer t;
-    t.restart();
+    statistics stats;
 
-    // Compute sample
-    ParDivideSampling<> pds(config, config.seed, size);
-    pds.sample(config.n,
-               1,
-               size,
-               rank,
-               [&](ULONG elem) {
-                   // fprintf(fp, "%lld\n", elem);
-                   sample.push_back(elem);
-               });
+    std::cout << "warmup" << std::endl;
+    for (ULONG iteration = 0; iteration < 100; ++iteration) {
+        sample.clear();
+        MPI_Barrier(MPI_COMM_WORLD);
 
-    // Stop measurements
-    double time_taken = t.elapsed();
+        // Compute sample
+        ParDivideSampling<> pds(config, config.seed + iteration, size);
+        pds.sample(config.n,
+                   1,
+                   size,
+                   rank,
+                   [&](ULONG elem) {
+                       // fprintf(fp, "%lld\n", elem);
+                       sample.push_back(elem);
+                   });
+    }
 
-    double max_time_taken = 0.0;
-    MPI_Reduce(&time_taken, &max_time_taken, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    std::cout << "measurements" << std::endl;
+    for (ULONG iteration = 0; iteration < config.iterations; ++iteration) {
+        sample.clear();
+        MPI_Barrier(MPI_COMM_WORLD);
+        t.restart();
 
-    ULONG samples = sample.size();
-    ULONG total_samples = 0;
-    MPI_Reduce(&samples, &total_samples, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+        // Compute sample
+        ParDivideSampling<> pds(config, config.seed + iteration, size);
+        pds.sample(config.n,
+                   1,
+                   size,
+                   rank,
+                   [&](ULONG elem) {
+                       // fprintf(fp, "%lld\n", elem);
+                       sample.push_back(elem);
+                   });
+
+        double time = t.elapsed();
+        double max_time = 0.0;
+        MPI_Reduce(&time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+        if (rank == ROOT) stats.push(max_time);
+    }
+
 
     if (rank == ROOT) {
-        std::cout << "sampled " << total_samples << " elements" << std::endl;
-        std::cout << "total time " << max_time_taken << std::endl;
-        fprintf(fp, "total time %f", max_time_taken);
+        std::cout << "RESULT runner=P" 
+                  << " time=" << stats.avg()
+                  << " stddev=" << stats.stddev()
+                  << " iterations=" << config.iterations << std::endl;
+        fprintf(fp, "RESULT runner=P time=%f stddev=%f iterations=%d\n", stats.avg(), stats.stddev(), config.iterations);
         fclose(fp);
     }
 
