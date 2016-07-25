@@ -65,7 +65,7 @@ class HashSampling {
                     ULONG n, 
                     F &&callback) {
             ULONG variate, index, hash_elem;
-            ULONG address_mask = LOG2(N) - table_lg + 1;
+            ULONG address_mask = LOG2(N + 1) - table_lg + 1;
 
             // Modification: dSFMT
             ULONG curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
@@ -82,10 +82,10 @@ class HashSampling {
                     if (array_index >= curr_blocksize) {
                         curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
                         delete[] randblock; randblock = new double[curr_blocksize];
-                        dsfmt_fill_array_close_open(&dsfmt, randblock, curr_blocksize);
+                        dsfmt_fill_array_open_close(&dsfmt, randblock, curr_blocksize);
                         array_index = 0;
                     }
-                    variate = N * randblock[array_index++];
+                    variate = N * randblock[array_index++] + 1;
                     // Modification: End
                     
                     // variate = N * gen.Random();
@@ -97,19 +97,29 @@ class HashSampling {
                     else if (hash_elem == variate) continue; // already sampled
                     else {
 increment:
-                        ++index;
-                        if (unlikely(index >= table_size)) index = 0; // restart probing
-                        hash_elem = *(offset + index); 
-                        if (hash_elem == 0) break; // done 
-                        else if (hash_elem == variate) continue; // already sampled
-                        goto increment; // keep incrementing
+                        if (hash_elem <= variate) { // continue as usual
+                            ++index;
+                            if (unlikely(index >= table_size)) index = 0; // restart probing
+                            hash_elem = *(offset + index); 
+                            if (hash_elem == 0) break; // done 
+                            else if (hash_elem == variate) continue; // already sampled
+                            goto increment; // keep incrementing
+                        } else {
+                            moveCluster(index, variate); // make space by moving larger elements
+                            break; // done
+                        }
                     }
                 }
                 // Add sample
                 *(offset + index) = variate;
                 indices.push_back(index);
-                callback(variate+1);
+                // callback(variate);
                 n--;
+            }
+
+            // Output in sorted sorted
+            for (ULONG elem : hash_table) {
+                if (elem != 0) callback(elem);
             }
 
             clear();
@@ -120,11 +130,11 @@ increment:
         }
 
         void clear() {
-            for (ULONG index : indices) hash_table[index] = 0; 
-            indices.clear();
+            // for (ULONG index : indices) hash_table[index] = 0; 
+            // indices.clear();
             // Alternative
             // memset(offset, 0, sizeof(ULONG)*table_size);
-            // std::fill(hash_table.begin(), hash_table.end(), 0);
+            std::fill(hash_table.begin(), hash_table.end(), 0);
         }
 
     private:
@@ -144,6 +154,18 @@ increment:
                 base *= base;
             }
             return result;
+        }
+
+        void moveCluster(ULONG index, ULONG variate) {
+            ULONG current_elem = *(offset + index);
+            ULONG next_elem = *(offset + index + 1);
+            while (next_elem != 0) {
+                ++index;
+                *(offset + index) = current_elem;
+                current_elem = next_elem;
+                next_elem = *(offset + index + 1);
+            } 
+            *(offset + index + 1) = current_elem;
         }
 };
 
