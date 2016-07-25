@@ -24,12 +24,12 @@
 #define _METHOD_H_H_
 
 #include <vector>
+
 #include "definitions.h"
 #include "randomc.h"
 #include "dSFMT.h"
 
 #define LOG2(X) ((unsigned) (8*sizeof (unsigned long long) - __builtin_clzll((X)) - 1))
-// #define LOG2(X) ((unsigned) (8*sizeof (unsigned long long) - __builtin_clzll((X)) - 1))
 #ifndef unlikely
 #define unlikely(x) __builtin_expect((x),0)
 #endif
@@ -112,7 +112,7 @@ increment:
                 }
                 // Add sample
                 *(offset + index) = variate;
-                indices.push_back(index);
+                // indices.push_back(index);
                 // callback(variate);
                 n--;
             }
