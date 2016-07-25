@@ -24,6 +24,7 @@
 #define _METHOD_H_H_
 
 #include <vector>
+#include <limits>
 
 #include "definitions.h"
 #include "randomc.h"
@@ -37,7 +38,7 @@
 #define likely(x) __builtin_expect((x),1)
 #endif
 
-template <typename RandomGenerator = CRandomMersenne, ULONG blocksize = (1 << 24)>
+template <typename RandomGenerator = CRandomMersenne, ULONG blocksize = (1 << 24), ULONG dummy = std::numeric_limits<ULONG>::max()>
 class HashSampling {
     public:
         HashSampling(ULONG seed, ULONG n) 
@@ -52,7 +53,7 @@ class HashSampling {
             // Table size
             table_lg = 3 + LOG2(n);
             table_size = ipow(2, table_lg);
-            hash_table.resize(table_size, 0);
+            hash_table.resize(table_size, dummy);
             indices.reserve(table_size);
             
             // Offset for fast indexing
@@ -64,8 +65,9 @@ class HashSampling {
         void sample(ULONG N, 
                     ULONG n, 
                     F &&callback) {
-            ULONG variate, index, hash_elem;
-            ULONG address_mask = LOG2(N + 1) - table_lg + 1;
+            ULONG variate, index;
+            ULONG hash_elem;
+            ULONG address_mask = LOG2(N) - table_lg;
 
             // Modification: dSFMT
             ULONG curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
@@ -85,7 +87,7 @@ class HashSampling {
                         dsfmt_fill_array_open_close(&dsfmt, randblock, curr_blocksize);
                         array_index = 0;
                     }
-                    variate = N * randblock[array_index++] + 1;
+                    variate = N * randblock[array_index++];
                     // Modification: End
                     
                     // variate = N * gen.Random();
@@ -93,7 +95,7 @@ class HashSampling {
                     hash_elem = *(offset + index);    
 
                     // Table lookup
-                    if (likely(hash_elem == 0)) break; // done
+                    if (likely(hash_elem == dummy)) break; // done
                     else if (hash_elem == variate) continue; // already sampled
                     else {
 increment:
@@ -101,7 +103,7 @@ increment:
                             ++index;
                             if (unlikely(index >= table_size)) index = 0; // restart probing
                             hash_elem = *(offset + index); 
-                            if (hash_elem == 0) break; // done 
+                            if (hash_elem == dummy) break; // done 
                             else if (hash_elem == variate) continue; // already sampled
                             goto increment; // keep incrementing
                         } else {
@@ -119,7 +121,7 @@ increment:
 
             // Output in sorted sorted
             for (ULONG elem : hash_table) {
-                if (elem != 0) callback(elem);
+                if (elem != dummy) callback(elem);
             }
 
             clear();
@@ -134,7 +136,7 @@ increment:
             // indices.clear();
             // Alternative
             // memset(offset, 0, sizeof(ULONG)*table_size);
-            std::fill(hash_table.begin(), hash_table.end(), 0);
+            std::fill(hash_table.begin(), hash_table.end(), dummy);
         }
 
     private:
@@ -159,8 +161,9 @@ increment:
         void moveCluster(ULONG index, ULONG variate) {
             ULONG current_elem = *(offset + index);
             ULONG next_elem = *(offset + index + 1);
-            while (next_elem != 0) {
+            while (next_elem != dummy) {
                 ++index;
+                if (unlikely(index >= table_size)) index = 0; // restart probing
                 *(offset + index) = current_elem;
                 current_elem = next_elem;
                 next_elem = *(offset + index + 1);

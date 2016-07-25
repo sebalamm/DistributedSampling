@@ -22,10 +22,8 @@
 #define _DEFINITIONS_H_
 
 // Constants
-// typedef long long LONG;
-// typedef unsigned long long ULONG;
-typedef int LONG;
-typedef unsigned int ULONG;
+typedef long long LONG;
+typedef unsigned long long ULONG;
 typedef int INT;
 typedef unsigned int UINT;
 typedef unsigned long long NodeID;
