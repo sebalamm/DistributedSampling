@@ -99,30 +99,30 @@ class HashSampling {
                     else if (hash_elem == variate) continue; // already sampled
                     else {
 increment:
-                        if (hash_elem <= variate) { // continue as usual
-                            ++index;
-                            if (unlikely(index >= table_size)) index = 0; // restart probing
-                            hash_elem = *(offset + index); 
-                            if (hash_elem == dummy) break; // done 
-                            else if (hash_elem == variate) continue; // already sampled
-                            goto increment; // keep incrementing
-                        } else {
-                            moveCluster(index, variate); // make space by moving larger elements
-                            break; // done
-                        }
+                        // if (hash_elem <= variate) { // continue as usual
+                        ++index;
+                        if (unlikely(index >= table_size)) index = 0; // restart probing
+                        hash_elem = *(offset + index); 
+                        if (hash_elem == dummy) break; // done 
+                        else if (hash_elem == variate) continue; // already sampled
+                        goto increment; // keep incrementing
+                        // } else {
+                            // moveCluster(index, variate); // make space by moving larger elements
+                            // break; // done
+                        // }
                     }
                 }
                 // Add sample
                 *(offset + index) = variate;
-                // indices.push_back(index);
-                // callback(variate);
+                indices.push_back(index);
+                callback(variate+1);
                 n--;
             }
 
             // Output in sorted sorted
-            for (ULONG elem : hash_table) {
-                if (elem != dummy) callback(elem);
-            }
+            // for (ULONG elem : hash_table) {
+            //     if (elem != dummy) callback(elem);
+            // }
 
             clear();
         }
@@ -132,11 +132,11 @@ increment:
         }
 
         void clear() {
-            // for (ULONG index : indices) hash_table[index] = 0; 
-            // indices.clear();
+            for (ULONG index : indices) hash_table[index] = 0; 
+            indices.clear();
             // Alternative
             // memset(offset, 0, sizeof(ULONG)*table_size);
-            std::fill(hash_table.begin(), hash_table.end(), dummy);
+            // std::fill(hash_table.begin(), hash_table.end(), dummy);
         }
 
     private:
