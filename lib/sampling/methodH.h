@@ -107,8 +107,8 @@ increment:
                         else if (hash_elem == variate) continue; // already sampled
                         goto increment; // keep incrementing
                         // } else {
-                            // moveCluster(index, variate); // make space by moving larger elements
-                            // break; // done
+                        //     moveCluster(index, variate); // make space by moving larger elements
+                        //     break; // done
                         // }
                     }
                 }
@@ -132,7 +132,7 @@ increment:
         }
 
         void clear() {
-            for (ULONG index : indices) hash_table[index] = 0; 
+            for (ULONG index : indices) hash_table[index] = dummy; 
             indices.clear();
             // Alternative
             // memset(offset, 0, sizeof(ULONG)*table_size);
