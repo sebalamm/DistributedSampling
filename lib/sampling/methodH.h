@@ -53,7 +53,6 @@ class HashSampling {
             // Table size
             table_lg = 3 + LOG2(n) + isNotPowerOfTwo(n);
             table_size = ipow(2, table_lg);
-            std::cout << "ts " << table_size << std::endl;
             hash_table.resize(table_size, dummy);
             indices.reserve(table_size);
             
@@ -66,9 +65,9 @@ class HashSampling {
         void sample(ULONG N, 
                     ULONG n, 
                     F &&callback) {
-            ULONG variate, index;
-            ULONG hash_elem;
-            ULONG address_mask = (LOG2(N) + isNotPowerOfTwo(N)) - table_lg;
+            ULONG variate, index, hash_elem;
+            ULONG population_lg = (LOG2(N) + isNotPowerOfTwo(N));
+            ULONG address_mask = (table_lg >= population_lg) ? 0 : population_lg - table_lg;
 
             // Modification: dSFMT
             ULONG curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());

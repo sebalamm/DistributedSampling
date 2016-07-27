@@ -56,7 +56,7 @@ int main(int argn, char **argv) {
     statistics stats;
 
     std::cout << "warmup" << std::endl;
-    for (ULONG iteration = 0; iteration < 100; ++iteration) {
+    for (ULONG iteration = 0; iteration < std::min((ULONG)100, config.iterations); ++iteration) {
         sample.clear();
 
         // Compute sample
