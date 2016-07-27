@@ -54,7 +54,7 @@ class HashSampling {
             table_lg = 3 + LOG2(n) + isNotPowerOfTwo(n);
             table_size = ipow(2, table_lg);
             hash_table.resize(table_size, dummy);
-            indices.reserve(table_size);
+            // indices.reserve(table_size);
             
             // Offset for fast indexing
             offset = &(hash_table[0]);
@@ -99,22 +99,22 @@ class HashSampling {
                     else if (hash_elem == variate) continue; // already sampled
                     else {
 increment:
-                        // if (hash_elem <= variate) { // continue as usual
-                        ++index;
-                        if (unlikely(index >= table_size)) index = 0; // restart probing
-                        hash_elem = *(offset + index); 
-                        if (hash_elem == dummy) break; // done 
-                        else if (hash_elem == variate) continue; // already sampled
-                        goto increment; // keep incrementing
-                        // } else {
-                        //     moveCluster(index, variate); // make space by moving larger elements
-                        //     break; // done
-                        // }
+                        if (hash_elem <= variate) { // continue as usual
+                            ++index;
+                            if (unlikely(index >= table_size)) index = 0; // restart probing
+                            hash_elem = *(offset + index); 
+                            if (hash_elem == dummy) break; // done 
+                            else if (hash_elem == variate) continue; // already sampled
+                            goto increment; // keep incrementing
+                        } else {
+                            moveCluster(index, variate); // make space by moving larger elements
+                            break; // done
+                        }
                     }
                 }
                 // Add sample
                 *(offset + index) = variate;
-                indices.push_back(index);
+                // indices.push_back(index);
                 callback(variate+1);
                 n--;
             }
@@ -127,15 +127,15 @@ increment:
             clear();
         }
 
-        bool isEmpty() {
-            return indices.empty();
-        }
+        // bool isEmpty() {
+        //     return indices.empty();
+        // }
 
         void clear() {
-            for (ULONG index : indices) hash_table[index] = dummy; 
-            indices.clear();
+            // for (ULONG index : indices) hash_table[index] = dummy; 
+            // indices.clear();
             // Alternative
-            // memset(offset, 0, sizeof(ULONG)*table_size);
+            memset(offset, dummy, sizeof(ULONG)*table_size);
             // std::fill(hash_table.begin(), hash_table.end(), dummy);
         }
 
@@ -143,7 +143,7 @@ increment:
         // RandomGenerator gen;
         dsfmt_t dsfmt;
 
-        std::vector<ULONG> indices;
+        // std::vector<ULONG> indices;
         std::vector<ULONG> hash_table;
         ULONG table_lg, table_size;
         ULONG *offset;
