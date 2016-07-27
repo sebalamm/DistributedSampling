@@ -30,7 +30,7 @@
 #include "randomc.h"
 #include "dSFMT.h"
 
-#define LOG2(X) ((unsigned) (8*sizeof (unsigned long long) - __builtin_clzll((X))))
+#define LOG2(X) ((unsigned) (8*sizeof (unsigned long long) - __builtin_clzll((X)) - 1))
 #ifndef unlikely
 #define unlikely(x) __builtin_expect((x),0)
 #endif
@@ -51,8 +51,9 @@ class HashSampling {
 
         void resizeTable(ULONG n) {
             // Table size
-            table_lg = 3 + LOG2(n);
+            table_lg = 3 + LOG2(n) + isNotPowerOfTwo(n);
             table_size = ipow(2, table_lg);
+            std::cout << "ts " << table_size << std::endl;
             hash_table.resize(table_size, dummy);
             indices.reserve(table_size);
             
@@ -67,7 +68,7 @@ class HashSampling {
                     F &&callback) {
             ULONG variate, index;
             ULONG hash_elem;
-            ULONG address_mask = LOG2(N) - table_lg;
+            ULONG address_mask = (LOG2(N) + isNotPowerOfTwo(N)) - table_lg;
 
             // Modification: dSFMT
             ULONG curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
@@ -148,7 +149,7 @@ increment:
         ULONG table_lg, table_size;
         ULONG *offset;
 
-        ULONG ipow(ULONG base, ULONG exp) {
+        inline ULONG ipow(ULONG base, ULONG exp) {
             ULONG result = 1;
             while (exp) {
                 if (exp & 1) result *= base;
@@ -169,6 +170,10 @@ increment:
                 next_elem = *(offset + index + 1);
             } 
             *(offset + index + 1) = current_elem;
+        }
+
+        inline bool isNotPowerOfTwo(ULONG x) {
+            return (x & (x - 1)) != 0;
         }
 };
 
