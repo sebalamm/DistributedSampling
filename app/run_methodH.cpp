@@ -22,6 +22,7 @@
 #include <argtable2.h>
 
 #include <vector>
+#include <algorithm>
 
 #include "timer.h"
 #include "macros_assertions.h"
@@ -67,6 +68,8 @@ int main(int argn, char **argv) {
                       // fprintf(fp, "%lld\n", elem);
                       sample.push_back(elem);
                   });
+
+        // if (!std::is_sorted(sample.begin(), sample.end())) std::cout << "not sorted!" << std::endl;
     }
 
     std::cout << "measurements" << std::endl;
