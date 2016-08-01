@@ -54,7 +54,6 @@ class HashSampling {
             table_lg = 3 + LOG2(n) + isNotPowerOfTwo(n);
             table_size = ipow(2, table_lg);
             hash_table.resize(table_size, dummy);
-            indices.reserve(table_size);
             
             // Offset for fast indexing
             offset = &(hash_table[0]);
@@ -65,6 +64,7 @@ class HashSampling {
         void sample(ULONG N, 
                     ULONG n, 
                     F &&callback) {
+            ULONG orig_n = n;
             ULONG variate, index, hash_elem;
             ULONG population_lg = (LOG2(N) + isNotPowerOfTwo(N));
             ULONG address_mask = (table_lg >= population_lg) ? 0 : population_lg - table_lg;
@@ -99,59 +99,56 @@ class HashSampling {
                     else if (hash_elem == variate) continue; // already sampled
                     else {
 increment:
-                        // if (hash_elem <= variate) { // continue as usual
                         ++index;
                         index &= (table_size - 1);
                         hash_elem = *(offset + index); 
                         if (hash_elem == dummy) break; // done 
                         else if (hash_elem == variate) continue; // already sampled
                         goto increment; // keep incrementing
-                        // } else {
-                        //     moveCluster(index, variate); // make space by moving larger elements
-                        //     break; // done
-                        // }
                     }
                 }
                 // Add sample
                 *(offset + index) = variate;
-                indices.push_back(index);
-                callback(variate + 1);
                 n--;
             }
 
-            // // Find smallest element
-            // ULONG smallest_index = 0;
-            // for (ULONG i = 0; i < table_size; ++i) {
-            //     if (hash_table[i] < hash_table[smallest_index]) smallest_index = i; 
-            // }
 
-            // // Output in sorted order starting at smallest element
-            // ULONG prev = 0;
-            // for (ULONG i = 0; i < table_size; ++i) {
-            //     ULONG elem = hash_table[(smallest_index + i) & (table_size - 1)];
-            //     if (elem != dummy) {
-            //         if (elem < prev) std::cout << "err " << elem << " @ " << smallest_index + i << " p " << prev << " s " << hash_table[smallest_index] << " @ " << smallest_index << std::endl;
-            //         callback(elem + 1);
-            //         prev = elem;
-            //     }
-            // }
+            // Condense
+            ULONG i = 0;
+            ULONG j = 0;
+            while (i < orig_n) {
+                while (*(offset + j) == dummy) j++;
+                *(offset + i) = *(offset + j); i++;
+            }
 
+            // Exchange sort
+            ULONG tmp;   
+            for (i = 0; i < orig_n-1; i++) {
+                for (j = i+1; j < orig_n; j++) {
+                    if (*(offset + i) < *(offset + j)) {
+                        tmp = *(offset + i);   
+                        *(offset + i) = *(offset + j);
+                        *(offset + j) = tmp;
+                    }
+                }
+            }
+
+            // Output in sorted order
+            for (i = 0; i < orig_n; i++) callback(*(offset + i) + 1);
+            
             clear();
         }
 
         void clear() {
-            for (ULONG index : indices) hash_table[index] = dummy; 
-            indices.clear();
             // Alternative
             // memset(offset, dummy, sizeof(ULONG)*table_size);
-            // std::fill(hash_table.begin(), hash_table.end(), dummy);
+            std::fill(hash_table.begin(), hash_table.end(), dummy);
         }
 
     private:
         // RandomGenerator gen;
         dsfmt_t dsfmt;
 
-        std::vector<ULONG> indices;
         std::vector<ULONG> hash_table;
         ULONG table_lg, table_size;
         ULONG *offset;
