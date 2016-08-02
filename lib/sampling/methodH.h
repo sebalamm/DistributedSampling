@@ -144,7 +144,7 @@ increment:
         void clear() {
             // Alternative
             // memset(offset, dummy, sizeof(ULONG)*table_size);
-            std::fill(hash_table.begin(), hash_table.end() + orig_n, dummy);
+            std::fill(hash_table.begin(), hash_table.begin() + orig_n, dummy);
         }
 
     private:
