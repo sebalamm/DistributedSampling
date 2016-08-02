@@ -71,6 +71,7 @@ class HashSampling {
 
             // Modification: dSFMT
             ULONG curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
+            curr_blocksize += (curr_blocksize & 0x1); // needs to be even
             double *randblock = new double[curr_blocksize];
             dsfmt_fill_array_open_close(&dsfmt, randblock, curr_blocksize);
             ULONG array_index = 0;
@@ -83,6 +84,7 @@ class HashSampling {
                     // Modification: dSFMT
                     if (array_index >= curr_blocksize) {
                         curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
+                        curr_blocksize += (curr_blocksize & 0x1); // needs to be even
                         // delete[] randblock; randblock = new double[curr_blocksize];
                         dsfmt_fill_array_open_close(&dsfmt, randblock, curr_blocksize);
                         array_index = 0;
