@@ -64,10 +64,10 @@ class HashSampling {
         void sample(ULONG N, 
                     ULONG n, 
                     F &&callback) {
-            ULONG orig_n = n;
             ULONG variate, index, hash_elem;
             ULONG population_lg = (LOG2(N) + isNotPowerOfTwo(N));
             ULONG address_mask = (table_lg >= population_lg) ? 0 : population_lg - table_lg;
+            orig_n = n;
 
             // Modification: dSFMT
             ULONG curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
@@ -118,14 +118,14 @@ increment:
             ULONG j = 0;
             while (i < orig_n) {
                 while (*(offset + j) == dummy) j++;
-                *(offset + i) = *(offset + j); i++;
+                *(offset + i) = *(offset + j); i++; j++;
             }
 
             // Exchange sort
             ULONG tmp;   
             for (i = 0; i < orig_n-1; i++) {
                 for (j = i+1; j < orig_n; j++) {
-                    if (*(offset + i) < *(offset + j)) {
+                    if (*(offset + i) > *(offset + j)) {
                         tmp = *(offset + i);   
                         *(offset + i) = *(offset + j);
                         *(offset + j) = tmp;
@@ -142,7 +142,7 @@ increment:
         void clear() {
             // Alternative
             // memset(offset, dummy, sizeof(ULONG)*table_size);
-            std::fill(hash_table.begin(), hash_table.end(), dummy);
+            std::fill(hash_table.begin(), hash_table.end() + orig_n, dummy);
         }
 
     private:
@@ -152,6 +152,7 @@ increment:
         std::vector<ULONG> hash_table;
         ULONG table_lg, table_size;
         ULONG *offset;
+        ULONG orig_n;
 
         inline ULONG ipow(ULONG base, ULONG exp) {
             ULONG result = 1;
