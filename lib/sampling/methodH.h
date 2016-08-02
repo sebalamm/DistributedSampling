@@ -25,6 +25,8 @@
 
 #include <vector>
 #include <limits>
+#include <iterator>
+#include <algorithm>
 
 #include "definitions.h"
 #include "randomc.h"
@@ -52,7 +54,7 @@ class HashSampling {
         void resizeTable(ULONG n) {
             // Table size
             table_lg = 3 + LOG2(n) + isNotPowerOfTwo(n);
-            table_size = ipow(2, table_lg);
+            table_size = ipow(2, table_lg + 1);
             hash_table.resize(table_size, dummy);
             
             // Offset for fast indexing
@@ -101,12 +103,18 @@ class HashSampling {
                     else if (hash_elem == variate) continue; // already sampled
                     else {
 increment:
-                        ++index;
-                        index &= (table_size - 1);
-                        hash_elem = *(offset + index); 
-                        if (hash_elem == dummy) break; // done 
-                        else if (hash_elem == variate) continue; // already sampled
-                        goto increment; // keep incrementing
+                        if (hash_elem < variate) {
+                            ++index;
+                            index &= (table_size - 1);
+                            hash_elem = *(offset + index); 
+                            if (hash_elem == dummy) break; // done 
+                            else if (hash_elem == variate) continue; // already sampled
+                            goto increment; // keep incrementing
+                        } else if (hash_elem == variate) {
+                            continue;
+                        } else {
+                            moveCluster(index, variate);
+                        }
                     }
                 }
                 // Add sample
@@ -114,37 +122,42 @@ increment:
                 n--;
             }
 
-
             // Condense
-            ULONG i = 0;
-            ULONG j = 0;
-            while (i < orig_n) {
-                while (*(offset + j) == dummy) j++;
-                *(offset + i) = *(offset + j); i++; j++;
-            }
+            // ULONG i = 0;
+            // ULONG j = 0;
+            // while (i < orig_n) {
+            //     while (*(offset + j) == dummy) j++;
+            //     *(offset + i) = *(offset + j); i++; j++;
+            // }
 
             // Exchange sort
-            ULONG tmp;   
-            for (i = 0; i < orig_n-1; i++) {
-                for (j = i+1; j < orig_n; j++) {
-                    if (*(offset + i) > *(offset + j)) {
-                        tmp = *(offset + i);   
-                        *(offset + i) = *(offset + j);
-                        *(offset + j) = tmp;
-                    }
+            // ULONG tmp;   
+            // for (i = 0; i < orig_n-1; i++) {
+            //     for (j = i+1; j < orig_n; j++) {
+            //         if (*(offset + i) > *(offset + j)) {
+            //             tmp = *(offset + i);   
+            //             *(offset + i) = *(offset + j);
+            //             *(offset + j) = tmp;
+            //         }
+            //     }
+            // }
+
+            // Insertion sort
+            // insertion_sort(std::begin(hash_table), std::begin(hash_table) + orig_n);
+
+            // Output in sorted order and clear
+            for (ULONG i = 0; i < table_size; i++) {
+                if (*(offset + i) != dummy) {
+                    callback(*(offset + i) + 1);
+                    *(offset + i) = dummy;
                 }
             }
-
-            // Output in sorted order
-            for (i = 0; i < orig_n; i++) callback(*(offset + i) + 1);
-            
-            clear();
         }
 
         void clear() {
             // Alternative
             // memset(offset, dummy, sizeof(ULONG)*table_size);
-            std::fill(hash_table.begin(), hash_table.begin() + orig_n, dummy);
+            std::fill(hash_table.begin(), hash_table.end(), dummy);
         }
 
     private:
@@ -179,12 +192,13 @@ increment:
                 next_index = (index + 1) & (table_size - 1);
                 next_elem = *(offset + next_index);
             } 
-            *(offset + next_index) = current_elem;
+            // *(offset + next_index) = current_elem;
         }
 
         inline bool isNotPowerOfTwo(ULONG x) {
             return (x & (x - 1)) != 0;
         }
+
 };
 
 #endif 
