@@ -29,7 +29,7 @@
 #include <algorithm>
 
 #include "definitions.h"
-#include "randomc.h"
+#include "mt_wrapper.h"
 #include "dSFMT.h"
 
 #define LOG2(X) ((unsigned) (8*sizeof (unsigned long long) - __builtin_clzll((X)) - 1))
@@ -40,12 +40,16 @@
 #define likely(x) __builtin_expect((x),1)
 #endif
 
-template <typename RandomGenerator = CRandomMersenne, ULONG blocksize = (1 << 24), ULONG dummy = std::numeric_limits<ULONG>::max()>
+template <typename RandomGenerator = MTWrapper, ULONG blocksize = (1 << 24), ULONG dummy = std::numeric_limits<ULONG>::max()>
 class HashSampling {
     public:
         HashSampling(ULONG seed, ULONG n) { 
             // Modification: dSFMT
             dsfmt_init_gen_rand(&dsfmt, seed);
+            curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
+            curr_blocksize += (curr_blocksize & 0x1); // needs to be even
+            randblock.reserve(curr_blocksize);
+
             resizeTable(n);
         }
 
@@ -70,10 +74,7 @@ class HashSampling {
             ULONG address_mask = (table_lg >= population_lg) ? 0 : population_lg - table_lg;
 
             // Modification: dSFMT
-            ULONG curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
-            curr_blocksize += (curr_blocksize & 0x1); // needs to be even
-            double *randblock = new double[curr_blocksize];
-            dsfmt_fill_array_open_close(&dsfmt, randblock, curr_blocksize);
+            dsfmt_fill_array_open_close(&dsfmt, &(randblock[0]), curr_blocksize);
             ULONG array_index = 0;
             // Modification: End
 
@@ -85,8 +86,7 @@ class HashSampling {
                     if (array_index >= curr_blocksize) {
                         curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
                         curr_blocksize += (curr_blocksize & 0x1); // needs to be even
-                        // delete[] randblock; randblock = new double[curr_blocksize];
-                        dsfmt_fill_array_open_close(&dsfmt, randblock, curr_blocksize);
+                        dsfmt_fill_array_open_close(&dsfmt, &(randblock[0]), curr_blocksize);
                         array_index = 0;
                     }
                     variate = N * randblock[array_index++];
@@ -127,7 +127,9 @@ increment:
         dsfmt_t dsfmt;
 
         std::vector<ULONG> hash_table, indices;
-        ULONG table_lg, table_size;
+        std::vector<double> randblock;
+
+        ULONG table_lg, table_size, curr_blocksize;
         ULONG *offset;
 
         inline ULONG ipow(ULONG base, ULONG exp) {

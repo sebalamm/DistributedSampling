@@ -26,9 +26,10 @@
 #include <cmath>
 #include "definitions.h"
 #include "randomc.h"
+#include "mt_wrapper.h"
 #include "macros_assertions.h"
 
-template <typename RandomGenerator = CRandomMersenne>
+template <typename RandomGenerator = MTWrapper>
 class Vitter {
     public:
         Vitter(ULONG seed) 
@@ -50,14 +51,14 @@ class Vitter {
 
             // Initialization
             ULONG sample = 0;
-            float Nreal = (float) N;
-            float top = Nreal - n;
+            double Nreal = (double) N;
+            double top = Nreal - n;
 
             // Main loop
             while (n >= 2) {
                 ULONG S = 0;
-                float V = gen.Random();
-                float quot = top / Nreal;
+                double V = gen.Random();
+                double quot = top / Nreal;
                 while (quot > V) {
                     S++; 
                     top -= 1.0;
@@ -96,24 +97,24 @@ class Vitter {
             // Initialization
             ULONG sample = 0;
             // ULONG num_sample = 0;
-            float nreal = (float) n; 
-            float ninv = 1.0 / nreal; 
-            float Nreal = (float) N;
-            float Vprime = exp(log(gen.Random()) * ninv);
+            double nreal = (double) n; 
+            double ninv = 1.0 / nreal; 
+            double Nreal = (double) N;
+            double Vprime = exp(log(gen.Random()) * ninv);
             ULONG qu1 = N + 1 - n; 
-            float qu1real = Nreal + 1.0 - nreal;
+            double qu1real = Nreal + 1.0 - nreal;
             ULONG negalphainv = -13; 
             ULONG threshold = n * (-negalphainv);
             ULONG S = 0;
 
             // Main loop
             while (n > 1 && threshold < N) {
-                float nmin1inv = 1.0 / (nreal - 1.0);
-                float negSreal = 0.0;
+                double nmin1inv = 1.0 / (nreal - 1.0);
+                double negSreal = 0.0;
 
                 while (true) {
                     // Step D2: Generate U and X
-                    float X;
+                    double X;
                     while (true) {
                         X = Nreal * (1.0 - Vprime); 
                         S = X;
@@ -121,18 +122,18 @@ class Vitter {
                         Vprime = exp(log(gen.Random()) * ninv);
                     }
 
-                    float U = gen.Random(); 
-                    negSreal = -(float)S;
+                    double U = gen.Random(); 
+                    negSreal = -(double)S;
 
                     // Step D3: Accept?
-                    float y1 = exp(log(U * Nreal / qu1real) * nmin1inv);
+                    double y1 = exp(log(U * Nreal / qu1real) * nmin1inv);
                     Vprime = y1 * (-X / Nreal + 1.0) * (qu1real / (negSreal + qu1real));
                     if (Vprime <= 1.0) break; // Accept!
 
                     // Step D4: Accept?
-                    float y2 = 1.0; float top = Nreal - 1.0;
-                    float bottom;
-                    float limit;
+                    double y2 = 1.0; double top = Nreal - 1.0;
+                    double bottom;
+                    double limit;
                     if (n - 1 > S) {
                         bottom = Nreal - nreal; 
                         limit = N - S;

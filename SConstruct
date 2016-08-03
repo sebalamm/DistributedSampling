@@ -67,6 +67,7 @@ env = GetEnvironment()
 env.Append(LIBPATH=['./optimized'])
 env.Append(CPPPATH=['./extern/stocc64'])
 env.Append(CPPPATH=['./extern/mersenne64'])
+env.Append(CPPPATH=['./extern/mt19937-64'])
 env.Append(CPPPATH=['./extern/spooky'])
 env.Append(CPPPATH=['./extern/city'])
 env.Append(CPPPATH=['./extern/dSFMT'])
@@ -81,6 +82,7 @@ env.Append(CPPPATH=['./lib/sampling'])
 env.Append(LIBPATH=['../optimized'])
 env.Append(CPPPATH=['../extern/stocc64'])
 env.Append(CPPPATH=['../extern/mersenne64'])
+env.Append(CPPPATH=['../extern/mt19937-64'])
 env.Append(CPPPATH=['../extern/spooky'])
 env.Append(CPPPATH=['../extern/city'])
 env.Append(CPPPATH=['../extern/dSFMT'])
@@ -101,7 +103,7 @@ env.Append(CXXFLAGS = '-fopenmp')
 
 # Apply variant specific settings.
 if env['variant'] == 'optimized':
-    env.Append(CXXFLAGS = '-DNDEBUG -DHAVE_SSE2 -Wall -march=native -mavx2 -fno-stack-limit -O3 -g -std=c++0x -Wall -Wno-literal-suffix -msse4.2 -ffast-math')
+    env.Append(CXXFLAGS = '-DNDEBUG -DHAVE_SSE2 -Wall -march=native -mavx2 -fno-stack-limit -O3 -g -std=c++0x -Wall -ffast-math')
     env.Append(CCFLAGS  = '-DNDEBUG -DHAVE_SSE2 -march=native -mavx2 -O3 -g -ffast-math')
 
 elif env['variant'] == 'debug':
