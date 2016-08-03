@@ -71,7 +71,7 @@ int main(int argn, char **argv) {
                    });
 
         if (!std::is_sorted(sample.begin(), sample.end())) std::cout << "not sorted!" << std::endl;
-        if (sample.size() != config.n) std::cout << "wrong size!" << std::endl;
+        if (sample.size() != config.n) std::cout << "wrong size " << sample.size() << "!" << std::endl;
     }
 
     std::cout << "measurements" << std::endl;
