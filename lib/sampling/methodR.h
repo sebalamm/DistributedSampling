@@ -28,6 +28,7 @@
 #include "randomc.h"
 #include "sampling/methodD.h"
 #include "sampling/methodH.h"
+#include "sampling/methodSH.h"
 
 template <typename Stocc = StochasticLib1, typename BaseSampler = HashSampling<>>
 class SeqDivideSampling {

@@ -29,7 +29,7 @@
 #include <algorithm>
 
 #include "definitions.h"
-#include "randomc.h"
+#include "mt_wrapper.h"
 #include "dSFMT.h"
 
 #define LOG2(X) ((unsigned) (8*sizeof (unsigned long long) - __builtin_clzll((X)) - 1))
@@ -40,7 +40,7 @@
 #define likely(x) __builtin_expect((x),1)
 #endif
 
-template <typename RandomGenerator = CRandomMersenne, ULONG blocksize = (1 << 24), ULONG dummy = std::numeric_limits<ULONG>::max()>
+template <typename RandomGenerator = MTWrapper, ULONG blocksize = (1 << 24), ULONG dummy = std::numeric_limits<ULONG>::max()>
 class SortedHashSampling {
     public:
         SortedHashSampling(ULONG seed, ULONG n) { 
