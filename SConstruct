@@ -40,14 +40,14 @@ HOME = os.environ['HOME']
 def GetEnvironment():
     opts = Variables()
     opts.Add('variant', 'the variant to build', 'optimized')
-    opts.Add('program', 'program or interface to compile', 'library, run_methodD, run_methodH, run_methodR, run_methodP, run_experiments')
+    opts.Add('program', 'program or interface to compile', 'library, run_methodD, run_methodH, run_methodSH, run_methodR, run_methodP, run_experiments')
 
     env = Environment(options=opts, ENV=os.environ)
     if not env['variant'] in ['optimized', 'debug']:
         print 'Illegal value for variant: %s' % env['variant']
         sys.exit(1)
 
-    if not env['program'] in ['library', 'run_methodD', 'run_methodH', 'run_methodR', 'run_methodP', 'run_experiments']:
+    if not env['program'] in ['library', 'run_methodD', 'run_methodH', 'run_methodSH', 'run_methodR', 'run_methodP', 'run_experiments']:
         print 'Illegal value for program: %s' % env['program']
         sys.exit(1)
 

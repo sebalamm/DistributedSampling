@@ -29,7 +29,7 @@
 /***********************************************************************
                       Poisson distribution
 ***********************************************************************/
-int32_t StochasticLib2::Poisson (double L) {
+int64_t StochasticLib2::Poisson (double L) {
 /*
    This function generates a random variate with the poisson distribution.
 
@@ -80,7 +80,7 @@ int32_t StochasticLib2::Poisson (double L) {
 /***********************************************************************
                       Binomial distributuion
 ***********************************************************************/
-int32_t StochasticLib2::Binomial (int32_t n, double p) {
+int64_t StochasticLib2::Binomial (int64_t n, double p) {
 /*
    This function generates a random variate with the binomial distribution.
 
@@ -89,8 +89,8 @@ int32_t StochasticLib2::Binomial (int32_t n, double p) {
 
    For n*p < 1.E-6 numerical inaccuracy is avoided by poisson approximation.
 */
-  int inv = 0;                         // invert
-  int32_t x;                           // result
+  int64_t inv = 0;                         // invert
+  int64_t x;                           // result
   double np = n * p;
 
   if (p > 0.5) {                       // faster calculation by inversion
@@ -188,7 +188,7 @@ int64_t StochasticLib2::Hypergeometric (int64_t n, int64_t m, int64_t N) {
                   Subfunctions used by binomial
 ***********************************************************************/
 
-int32_t StochasticLib2::BinomialModeSearch(int32_t n, double p) {
+int64_t StochasticLib2::BinomialModeSearch(int64_t n, double p) {
 /* 
   Subfunction for Binomial distribution. Assumes p < 0.5.
 
@@ -198,7 +198,7 @@ int32_t StochasticLib2::BinomialModeSearch(int32_t n, double p) {
   
   This method is fast when n*p is low. 
 */   
-  int32_t K, x;
+  int64_t K, x;
   double  U, c, d, rc, divisor;
 
   if (n != bino_n_last || p != bino_p_last) {
@@ -207,9 +207,9 @@ int32_t StochasticLib2::BinomialModeSearch(int32_t n, double p) {
     rc = (n + 1) * p;
 
     // safety bound guarantees at least 17 significant decimal digits
-    bino_bound = (int32_t)(rc + 11.0*(sqrt(rc) + 1.0));
+    bino_bound = (int64_t)(rc + 11.0*(sqrt(rc) + 1.0));
     if (bino_bound > n)  bino_bound = n;
-    bino_mode = (int32_t) rc;
+    bino_mode = (int64_t) rc;
     if (bino_mode == rc && p == 0.5) bino_mode--;    // mode
     bino_r1 = p / (1.0 - p);
     bino_g = exp(LnFac(n)-LnFac(bino_mode)-LnFac(n-bino_mode) + bino_mode*log(p) + (n-bino_mode)*log(1.-p));
@@ -245,13 +245,13 @@ int32_t StochasticLib2::BinomialModeSearch(int32_t n, double p) {
 }
 
 
-int32_t StochasticLib2::BinomialPatchwork(int32_t n, double p) {
+int64_t StochasticLib2::BinomialPatchwork(int64_t n, double p) {
 /*
   Subfunction for Binomial distribution using the patchwork rejection
   method (BPRS).
 */  
 
-  int32_t         mode, Dk, X, Y;
+  int64_t         mode, Dk, X, Y;
   double        nu, q, U, V, W;
 
   if (n != bino_n_last || p != bino_p_last) {    // set-up
@@ -265,9 +265,9 @@ int32_t StochasticLib2::BinomialPatchwork(int32_t n, double p) {
 
     // mode, reflection points k2 and k4, and points k1 and k5, which
     // delimit the centre region of h(x)
-    mode = (int32_t) nu;
-    Bino_k2 = (int32_t) ceil(nu - 0.5 - W);
-    Bino_k4 = (int32_t)     (nu - 0.5 + W);
+    mode = (int64_t) nu;
+    Bino_k2 = (int64_t) ceil(nu - 0.5 - W);
+    Bino_k4 = (int64_t)     (nu - 0.5 + W);
     Bino_k1 = Bino_k2 + Bino_k2 - mode + 1;
     Bino_k5 = Bino_k4 + Bino_k4 - mode;
 
@@ -312,13 +312,13 @@ int32_t StochasticLib2::BinomialPatchwork(int32_t n, double p) {
 
     if ((U = Random() * Bino_p6) < Bino_p2) {         // centre left
       // immediate acceptance region R2 = [k2, mode) *[0, f2),  X = k2, ... mode -1
-      if ((V = U - Bino_p1) < 0.) return(Bino_k2 + (int32_t)(U/Bino_f2));
+      if ((V = U - Bino_p1) < 0.) return(Bino_k2 + (int64_t)(U/Bino_f2));
       // immediate acceptance region R1 = [k1, k2)*[0, f1),  X = k1, ... k2-1
-      if ((W = V / Bino_dl) < Bino_f1) return(Bino_k1 + (int32_t)(V/Bino_f1));
+      if ((W = V / Bino_dl) < Bino_f1) return(Bino_k1 + (int64_t)(V/Bino_f1));
 
       // computation of candidate X < k2, and its counterpart Y > k2
       // either squeeze-acceptance of X or acceptance-rejection of Y
-      Dk = (int32_t)(Bino_dl * Random()) + 1;
+      Dk = (int64_t)(Bino_dl * Random()) + 1;
       if (W <= Bino_f2 - Dk * (Bino_f2 - Bino_f2/Bino_r2)) {     // quick accept of
         return(Bino_k2 - Dk);}                                   // X = k2 - Dk
       if ((V = Bino_f2 + Bino_f2 - W) < 1.) {                    // quick reject of Y
@@ -330,13 +330,13 @@ int32_t StochasticLib2::BinomialPatchwork(int32_t n, double p) {
     
     else if (U < Bino_p4) {                                      // centre right
       // immediate acceptance region R3 = [mode, k4+1)*[0, f4), X = mode, ... k4
-      if ((V = U - Bino_p3) < 0.) return(Bino_k4 - (int32_t)((U - Bino_p2)/Bino_f4));
+      if ((V = U - Bino_p3) < 0.) return(Bino_k4 - (int64_t)((U - Bino_p2)/Bino_f4));
       // immediate acceptance region R4 = [k4+1, k5+1)*[0, f5)
-      if ((W = V / Bino_dr) < Bino_f5) return(Bino_k5 - (int32_t)(V/Bino_f5));
+      if ((W = V / Bino_dr) < Bino_f5) return(Bino_k5 - (int64_t)(V/Bino_f5));
 
       // computation of candidate X > k4, and its counterpart Y < k4
       // either squeeze-acceptance of X or acceptance-rejection of Y
-      Dk = (int32_t)(Bino_dr * Random()) + 1;
+      Dk = (int64_t)(Bino_dr * Random()) + 1;
       if (W <= Bino_f4 - Dk * (Bino_f4 - Bino_f4*Bino_r4)) {     // quick accept of
         return(Bino_k4 + Dk);}                                   // X = k4 + Dk
       if ((V = Bino_f4 + Bino_f4 - W) < 1.) {                    // quick reject of Y
@@ -350,7 +350,7 @@ int32_t StochasticLib2::BinomialPatchwork(int32_t n, double p) {
     else {
       W = Random();
       if (U < Bino_p5) {                                   // expon. tail left
-        Dk = (int32_t)(1. - log(W)/Bino_ll);
+        Dk = (int64_t)(1. - log(W)/Bino_ll);
         if ((X = Bino_k1 - Dk) < 0) continue;              // 0 <= X <= k1 - 1
         W *= (U - Bino_p4) * Bino_ll;                      // W -- U(0, h(x))
         if (W <= Bino_f1 - Dk * (Bino_f1 - Bino_f1/Bino_r1)) {
@@ -358,7 +358,7 @@ int32_t StochasticLib2::BinomialPatchwork(int32_t n, double p) {
         }
       }
       else {                                               // expon. tail right
-        Dk = (int32_t)(1. - log(W)/Bino_lr);
+        Dk = (int64_t)(1. - log(W)/Bino_lr);
         if ((X = Bino_k5 + Dk) > n ) continue;             // k5 + 1 <= X <= n
         W *= (U - Bino_p5) * Bino_lr;                      // W -- U(0, h(x))
         if (W <= Bino_f5 - Dk * (Bino_f5 - Bino_f5*Bino_r5)) {
@@ -378,7 +378,7 @@ int32_t StochasticLib2::BinomialPatchwork(int32_t n, double p) {
 }
 
   
-double StochasticLib2::BinomialF(int32_t k, int32_t n, double l_pq, double c_pm) {
+double StochasticLib2::BinomialF(int64_t k, int64_t n, double l_pq, double c_pm) {
   // used by BinomialPatchwork
   return exp(k*l_pq - LnFac(k) - LnFac(n - k) - c_pm);
 }
@@ -388,7 +388,7 @@ double StochasticLib2::BinomialF(int32_t k, int32_t n, double l_pq, double c_pm)
                   Subfunctions used by poisson
 ***********************************************************************/
 
-int32_t StochasticLib2::PoissonModeSearch(double L) {
+int64_t StochasticLib2::PoissonModeSearch(double L) {
 /*
    This subfunction generates a random variate with the poisson 
    distribution by down/up search from the mode, using the chop-down 
@@ -397,13 +397,13 @@ int32_t StochasticLib2::PoissonModeSearch(double L) {
    Execution time grows with sqrt(L). Gives overflow for L > 60.
 */
   double   r, c, d; 
-  int32_t  x, i, mode;
+  int64_t  x, i, mode;
 
-  mode = (int32_t)L;
+  mode = (int64_t)L;
   
   if (L != pois_L_last) {  // set up
     pois_L_last = L;
-    pois_bound = (int32_t)floor(L+0.5 + 7.0 * (sqrt(L+L+1.) + 1.5));// safety-bound
+    pois_bound = (int64_t)floor(L+0.5 + 7.0 * (sqrt(L+L+1.) + 1.5));// safety-bound
     pois_f0 = exp(mode * log(L) - L - LnFac(mode));        // probability of x=mode
   }
 
@@ -435,7 +435,7 @@ int32_t StochasticLib2::PoissonModeSearch(double L) {
 }
   
 
-int32_t StochasticLib2::PoissonPatchwork(double L) {
+int64_t StochasticLib2::PoissonPatchwork(double L) {
 /*
    This subfunction generates a random variate with the poisson 
    distribution using the Patchwork Rejection method (PPRS):
@@ -458,7 +458,7 @@ int32_t StochasticLib2::PoissonPatchwork(double L) {
    tabulated.   
 */
 
-  int32_t mode, Dk, X, Y;
+  int64_t mode, Dk, X, Y;
   double  Ds, U, V, W;
       
   if (L != pois_L_last) { // set-up
@@ -469,9 +469,9 @@ int32_t StochasticLib2::PoissonPatchwork(double L) {
 
     // mode, reflection points k2 and k4, and points k1 and k5, which
     // delimit the centre region of h(x)
-    mode = (int32_t) L;
-    Pois_k2 = (int32_t) ceil(L - 0.5 - Ds);
-    Pois_k4 = (int32_t)     (L - 0.5 + Ds);
+    mode = (int64_t) L;
+    Pois_k2 = (int64_t) ceil(L - 0.5 - Ds);
+    Pois_k4 = (int64_t)     (L - 0.5 + Ds);
     Pois_k1 = Pois_k2 + Pois_k2 - mode + 1;
     Pois_k5 = Pois_k4 + Pois_k4 - mode;
 
@@ -515,13 +515,13 @@ int32_t StochasticLib2::PoissonPatchwork(double L) {
     if ((U = Random() * Pois_p6) < Pois_p2) {              // centre left
 
       // immediate acceptance region R2 = [k2, mode) *[0, f2),  X = k2, ... mode -1
-      if ((V = U - Pois_p1) < 0.0)  return(Pois_k2 + (int32_t)(U/Pois_f2));
+      if ((V = U - Pois_p1) < 0.0)  return(Pois_k2 + (int64_t)(U/Pois_f2));
       // immediate acceptance region R1 = [k1, k2)*[0, f1),  X = k1, ... k2-1
-      if ((W = V / Pois_dl) < Pois_f1 )  return(Pois_k1 + (int32_t)(V/Pois_f1));
+      if ((W = V / Pois_dl) < Pois_f1 )  return(Pois_k1 + (int64_t)(V/Pois_f1));
 
       // computation of candidate X < k2, and its counterpart Y > k2
       // either squeeze-acceptance of X or acceptance-rejection of Y
-      Dk = (int32_t)(Pois_dl * Random()) + 1;
+      Dk = (int64_t)(Pois_dl * Random()) + 1;
       if (W <= Pois_f2 - Dk * (Pois_f2 - Pois_f2/Pois_r2)) {           // quick accept of
         return(Pois_k2 - Dk);                                // X = k2 - Dk
       }
@@ -537,13 +537,13 @@ int32_t StochasticLib2::PoissonPatchwork(double L) {
     }          
     else if (U < Pois_p4) {                                   // centre right
       //  immediate acceptance region R3 = [mode, k4+1)*[0, f4), X = mode, ... k4
-      if ((V = U - Pois_p3) < 0.)  return(Pois_k4 - (int32_t)((U - Pois_p2)/Pois_f4));
+      if ((V = U - Pois_p3) < 0.)  return(Pois_k4 - (int64_t)((U - Pois_p2)/Pois_f4));
       // immediate acceptance region R4 = [k4+1, k5+1)*[0, f5)
-      if ((W = V / Pois_dr) < Pois_f5)  return(Pois_k5 - (int32_t)(V/Pois_f5));
+      if ((W = V / Pois_dr) < Pois_f5)  return(Pois_k5 - (int64_t)(V/Pois_f5));
 
       // computation of candidate X > k4, and its counterpart Y < k4
       // either squeeze-acceptance of X or acceptance-rejection of Y
-      Dk = (int32_t)(Pois_dr * Random()) + 1L;
+      Dk = (int64_t)(Pois_dr * Random()) + 1L;
       if (W <= Pois_f4 - Dk * (Pois_f4 - Pois_f4*Pois_r4)) {           // quick accept of
         return (Pois_k4 + Dk);                                // X = k4 + Dk
       }
@@ -559,13 +559,13 @@ int32_t StochasticLib2::PoissonPatchwork(double L) {
     else {
       W = Random();
       if (U < Pois_p5) {                                      // expon. tail left
-        Dk = (int32_t)(1.0 - log(W)/Pois_ll);
+        Dk = (int64_t)(1.0 - log(W)/Pois_ll);
         if ((X = Pois_k1 - Dk) < 0L)  continue;               // 0 <= X <= k1 - 1
         W *= (U - Pois_p4) * Pois_ll;                            // W -- U(0, h(x))
         if (W <= Pois_f1-Dk * (Pois_f1-Pois_f1/Pois_r1)) return X;   // quick accept of X
       }
       else {                                               // expon. tail right
-        Dk = (int32_t)(1.0 - log(W)/Pois_lr);
+        Dk = (int64_t)(1.0 - log(W)/Pois_lr);
         X  = Pois_k5 + Dk;                                    // X >= k5 + 1
         W *= (U - Pois_p5) * Pois_lr;                            // W -- U(0, h(x))
         if (W <= Pois_f5-Dk * (Pois_f5-Pois_f5*Pois_r5)) return X;  // quick accept of X
@@ -580,7 +580,7 @@ int32_t StochasticLib2::PoissonPatchwork(double L) {
 }
     
     
-double StochasticLib2::PoissonF(int32_t k, double l_nu, double c_pm) {
+double StochasticLib2::PoissonF(int64_t k, double l_nu, double c_pm) {
   // used by PoissonPatchwork
   return  exp(k * l_nu - LnFac(k) - c_pm);
 }

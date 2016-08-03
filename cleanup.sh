@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Remove libs
-scons program=library variant=optimized -j 8
+scons program=library variant=optimized -j 8 -c
 
 # Remove apps
-for program in run_methodD run_methodH run_methodR run_methodP; do 
+for program in run_methodD run_methodH run_methodSH run_methodR run_methodP; do 
 scons program=$program variant=debug -j 8 -c
 if [ "$?" -ne "0" ]; then 
     echo "compile error in $program. exiting."
@@ -17,6 +17,6 @@ if [ "$?" -ne "0" ]; then
 fi
 done
 
-# rm -rf debug
+rm -rf debug
 rm -rf optimized
 

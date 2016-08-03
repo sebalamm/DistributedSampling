@@ -25,7 +25,7 @@
 * double Erf (double x);
 * Calculates the error function, which is the integral of the normal distribution.
 *
-* double LnFac(int32_t n);
+* double LnFac(int64_t n);
 * Calculates the natural logarithm of the factorial of n.
 *
 *
@@ -35,7 +35,7 @@
 * defined in randomc.h. StochasticLib1 provides the following non-uniform random 
 * variate generators:
 *
-* int Bernoulli(double p);
+* int64_t Bernoulli(double p);
 * Bernoulli distribution. Gives 0 or 1 with probability 1-p and p.
 *
 * double Normal(double m, double s);
@@ -44,23 +44,23 @@
 * double NormalTrunc(double m, double s, double limit);
 * Truncated normal distribution with tails cut off at m +/- limit
 *
-* int32_t Poisson (double L);
+* int64_t Poisson (double L);
 * Poisson distribution with mean L.
 *
-* int32_t Binomial (int32_t n, double p);
+* int64_t Binomial (int64_t n, double p);
 * Binomial distribution. n trials with probability p.
 *
-* int32_t Hypergeometric (int32_t n, int32_t m, int32_t N);
+* int64_t Hypergeometric (int64_t n, int64_t m, int64_t N);
 * Hypergeometric distribution. Taking n items out N, m of which are colored.
 *
-* void Multinomial (int32_t * destination, double * source, int32_t n, int colors);
-* void Multinomial (int32_t * destination, int32_t * source, int32_t n, int colors);
+* void Multinomial (int64_t * destination, double * source, int64_t n, int64_t colors);
+* void Multinomial (int64_t * destination, int64_t * source, int64_t n, int64_t colors);
 * Multivariate binomial distribution.
 *
-* void MultiHypergeometric (int32_t * destination, int32_t * source, int32_t n, int colors);
+* void MultiHypergeometric (int64_t * destination, int64_t * source, int64_t n, int64_t colors);
 * Multivariate hypergeometric distribution.
 *
-* void Shuffle(int * list, int min, int n);
+* void Shuffle(int64_t * list, int64_t min, int64_t n);
 * Shuffle a list of integers.
 *
 *
@@ -82,23 +82,23 @@
 * the univariate and multivariate Wallenius' and Fisher's noncentral
 * hypergeometric distributions.
 *
-* int32_t WalleniusNCHyp (int32_t n, int32_t m, int32_t N, double odds);
+* int64_t WalleniusNCHyp (int64_t n, int64_t m, int64_t N, double odds);
 * Sampling from Wallenius' noncentral hypergeometric distribution, which is 
 * what you get when taking n items out N, m of which are colored, without 
 * replacement, with bias.
 *
-* int32_t FishersNCHyp (int32_t n, int32_t m, int32_t N, double odds);
+* int64_t FishersNCHyp (int64_t n, int64_t m, int64_t N, double odds);
 * Sampling from Fisher's noncentral hypergeometric distribution which is the
 * conditional distribution of independent binomial variates given their sum n.
 *
-* void MultiWalleniusNCHyp (int32_t * destination, int32_t * source, double * weights, int32_t n, int colors);
+* void MultiWalleniusNCHyp (int64_t * destination, int64_t * source, double * weights, int64_t n, int64_t colors);
 * Sampling from multivariate Wallenius' noncentral hypergeometric distribution.
 *
-* void MultiFishersNCHyp (int32_t * destination, int32_t * source, double * weights, int32_t n, int colors);
+* void MultiFishersNCHyp (int64_t * destination, int64_t * source, double * weights, int64_t n, int64_t colors);
 * Sampling from multivariate Fisher's noncentral hypergeometric distribution.
 *
 *
-* Uniform random number generators (integer and float) are also available, as
+* Uniform random number generators (integer and double) are also available, as
 * these are inherited from the random number generator class that is the base
 * class of StochasticLib1.
 *
@@ -234,8 +234,8 @@ double LnFac(int64_t n);               // log factorial (stoc1.cpp)
 double LnFacr(double x);               // log factorial of non-integer (wnchyppr.cpp)
 double FallingFactorial(double a, double b); // Falling factorial (wnchyppr.cpp)
 double Erf (double x);                 // error function (wnchyppr.cpp)
-int32_t FloorLog2(float x);            // floor(log2(x)) for x > 0 (wnchyppr.cpp)
-int NumSD (double accuracy);           // used internally for determining summation interval
+int64_t FloorLog2(double x);            // floor(log2(x)) for x > 0 (wnchyppr.cpp)
+int64_t NumSD (double accuracy);           // used internally for determining summation interval
 
 
 /***********************************************************************
@@ -248,7 +248,7 @@ int NumSD (double accuracy);           // used internally for determining summat
 #endif
 
 // constant for LnFac function:
-static const int FAK_LEN = 1024;       // length of factorial table
+static const int64_t FAK_LEN = 1024;       // length of factorial table
 
 // The following tables are tables of residues of a certain expansion
 // of the error function. These tables are used in the Laplace method
@@ -259,11 +259,11 @@ static const int FAK_LEN = 1024;       // length of factorial table
 // is included in wnchyppr.cpp.
 
 // constants for ErfRes tables:
-static const int ERFRES_B = 16;        // begin: -log2 of lowest precision
-static const int ERFRES_E = 40;        // end:   -log2 of highest precision
-static const int ERFRES_S =  2;        // step size from begin to end
-static const int ERFRES_N = (ERFRES_E-ERFRES_B)/ERFRES_S+1; // number of tables
-static const int ERFRES_L = 48;        // length of each table
+static const int64_t ERFRES_B = 16;        // begin: -log2 of lowest precision
+static const int64_t ERFRES_E = 40;        // end:   -log2 of highest precision
+static const int64_t ERFRES_S =  2;        // step size from begin to end
+static const int64_t ERFRES_N = (ERFRES_E-ERFRES_B)/ERFRES_S+1; // number of tables
+static const int64_t ERFRES_L = 48;        // length of each table
 
 // tables of error function residues:
 extern "C" double ErfRes [ERFRES_N][ERFRES_L];
@@ -280,27 +280,27 @@ class StochasticLib1 : public STOC_BASE {
    // This class encapsulates the random variate generating functions.
    // May be derived from any of the random number generators.
 public:
-   StochasticLib1 (int seed);          // Constructor
-   int Bernoulli(double p);            // Bernoulli distribution
+   StochasticLib1 (int64_t seed);          // Constructor
+   int64_t Bernoulli(double p);            // Bernoulli distribution
    double Normal(double m, double s);  // Normal distribution
    double NormalTrunc(double m, double s, double limit); // Truncated normal distribution
-   int32_t Poisson (double L);         // Poisson distribution
+   int64_t Poisson (double L);         // Poisson distribution
    int64_t Binomial (int64_t n, double p); // Binomial distribution
    int64_t Hypergeometric (int64_t n, int64_t m, int64_t N); // Hypergeometric distribution
-   void Multinomial (int32_t * destination, double * source, int32_t n, int colors); // Multinomial distribution
-   void Multinomial (int32_t * destination, int32_t * source, int32_t n, int colors);// Multinomial distribution
-   void MultiHypergeometric (int32_t * destination, int32_t * source, int32_t n, int colors); // Multivariate hypergeometric distribution
-   void Shuffle(int * list, int min, int n); // Shuffle integers
+   void Multinomial (int64_t * destination, double * source, int64_t n, int64_t colors); // Multinomial distribution
+   void Multinomial (int64_t * destination, int64_t * source, int64_t n, int64_t colors);// Multinomial distribution
+   void MultiHypergeometric (int64_t * destination, int64_t * source, int64_t n, int64_t colors); // Multivariate hypergeometric distribution
+   void Shuffle(int64_t * list, int64_t min, int64_t n); // Shuffle integers
 
    // functions used internally
 protected:
-   // static double fc_lnpk(int32_t k, int32_t N_Mn, int32_t M, int32_t n); // used by Hypergeometric
+   // static double fc_lnpk(int64_t k, int64_t N_Mn, int64_t M, int64_t n); // used by Hypergeometric
    static double fc_lnpk(int64_t k, int64_t N_Mn, int64_t M, int64_t n); // used by Hypergeometric
 
    // subfunctions for each approximation method
-   int32_t PoissonInver(double L);                         // poisson by inversion
-   int32_t PoissonRatioUniforms(double L);                 // poisson by ratio of uniforms
-   int32_t PoissonLow(double L);                           // poisson for extremely low L
+   int64_t PoissonInver(double L);                         // poisson by inversion
+   int64_t PoissonRatioUniforms(double L);                 // poisson by ratio of uniforms
+   int64_t PoissonLow(double L);                           // poisson for extremely low L
    int64_t BinomialInver (int64_t n, double p);            // binomial by inversion
    int64_t BinomialRatioOfUniforms (int64_t n, double p);  // binomial by ratio of uniforms
    int64_t HypInversionMod (int64_t n, int64_t M, int64_t N);  // hypergeometric by inversion searching from mode
@@ -308,7 +308,7 @@ protected:
 
    // Variables specific to each distribution:
    // Variables used by Normal distribution
-   double normal_x2;  int normal_x2_valid;
+   double normal_x2;  int64_t normal_x2_valid;
 
    // Variables used by Hypergeometric distribution
    int64_t  hyp_n_last, hyp_m_last, hyp_N_last;            // Last values of parameters
@@ -324,7 +324,7 @@ protected:
    double pois_a;                                          // hat center
    double pois_h;                                          // hat width
    double pois_g;                                          // ln(L)
-   int32_t  pois_bound;                                    // upper bound
+   int64_t  pois_bound;                                    // upper bound
 
    // Variables used by Binomial distribution
    int64_t bino_n_last;                                    // last n
@@ -345,37 +345,37 @@ Class StochasticLib2
 class StochasticLib2 : public StochasticLib1 {
    // derived class, redefining some functions
 public:
-   int32_t Poisson (double L);                             // Poisson distribution
-   int32_t Binomial (int32_t n, double p);                 // Binomial distribution
+   int64_t Poisson (double L);                             // Poisson distribution
+   int64_t Binomial (int64_t n, double p);                 // Binomial distribution
    int64_t Hypergeometric(int64_t n, int64_t M, int64_t N);// Hypergeometric distribution
-   StochasticLib2(int seed):StochasticLib1(seed){};        // Constructor  
+   StochasticLib2(int64_t seed):StochasticLib1(seed){};        // Constructor  
 
    // subfunctions for each approximation method:
 protected:
-   int32_t PoissonModeSearch(double L);                    // poisson by search from mode
-   int32_t PoissonPatchwork(double L);                     // poisson by patchwork rejection
-   static double PoissonF(int32_t k, double l_nu, double c_pm); // used by PoissonPatchwork
-   int32_t BinomialModeSearch(int32_t n, double p);        // binomial by search from mode
-   int32_t BinomialPatchwork(int32_t n, double p);         // binomial by patchwork rejection
-   double BinomialF(int32_t k, int32_t n, double l_pq, double c_pm); // used by BinomialPatchwork
+   int64_t PoissonModeSearch(double L);                    // poisson by search from mode
+   int64_t PoissonPatchwork(double L);                     // poisson by patchwork rejection
+   static double PoissonF(int64_t k, double l_nu, double c_pm); // used by PoissonPatchwork
+   int64_t BinomialModeSearch(int64_t n, double p);        // binomial by search from mode
+   int64_t BinomialPatchwork(int64_t n, double p);         // binomial by patchwork rejection
+   double BinomialF(int64_t k, int64_t n, double l_pq, double c_pm); // used by BinomialPatchwork
    int64_t HypPatchwork (int64_t n, int64_t M, int64_t N); // hypergeometric by patchwork rejection
 
    // Variables used by Binomial distribution
-   int32_t  Bino_k1, Bino_k2, Bino_k4, Bino_k5;
+   int64_t  Bino_k1, Bino_k2, Bino_k4, Bino_k5;
    double Bino_dl, Bino_dr, Bino_r1, Bino_r2, Bino_r4, Bino_r5, 
       Bino_ll, Bino_lr, Bino_l_pq, Bino_c_pm,
       Bino_f1, Bino_f2, Bino_f4, Bino_f5, 
       Bino_p1, Bino_p2, Bino_p3, Bino_p4, Bino_p5, Bino_p6;
 
    // Variables used by Poisson distribution
-   int32_t  Pois_k1, Pois_k2, Pois_k4, Pois_k5;
+   int64_t  Pois_k1, Pois_k2, Pois_k4, Pois_k5;
    double Pois_dl, Pois_dr, Pois_r1, Pois_r2, Pois_r4, Pois_r5, 
       Pois_ll, Pois_lr, Pois_l_my, Pois_c_pm,
       Pois_f1, Pois_f2, Pois_f4, Pois_f5, 
       Pois_p1, Pois_p2, Pois_p3, Pois_p4, Pois_p5, Pois_p6;
 
    // Variables used by Hypergeometric distribution
-   int32_t  Hyp_L, Hyp_k1, Hyp_k2, Hyp_k4, Hyp_k5;
+   int64_t  Hyp_L, Hyp_k1, Hyp_k2, Hyp_k4, Hyp_k5;
    double Hyp_dl, Hyp_dr, 
       Hyp_r1, Hyp_r2, Hyp_r4, Hyp_r5, 
       Hyp_ll, Hyp_lr, Hyp_c_pm, 
@@ -392,28 +392,28 @@ class StochasticLib3 : public StochasticLib1 {
    // This class can be derived from either StochasticLib1 or StochasticLib2.
    // Adds more probability distributions
 public:
-   StochasticLib3(int seed);           // Constructor
+   StochasticLib3(int64_t seed);           // Constructor
    void SetAccuracy(double accur);     // Define accuracy of calculations
-   int32_t WalleniusNCHyp (int32_t n, int32_t m, int32_t N, double odds); // Wallenius noncentral hypergeometric distribution
-   int32_t FishersNCHyp (int32_t n, int32_t m, int32_t N, double odds); // Fisher's noncentral hypergeometric distribution
-   void MultiWalleniusNCHyp (int32_t * destination, int32_t * source, double * weights, int32_t n, int colors); // Multivariate Wallenius noncentral hypergeometric distribution
-   void MultiComplWalleniusNCHyp (int32_t * destination, int32_t * source, double * weights, int32_t n, int colors); // Multivariate complementary Wallenius noncentral hypergeometric distribution
-   void MultiFishersNCHyp (int32_t * destination, int32_t * source, double * weights, int32_t n, int colors); // Multivariate Fisher's noncentral hypergeometric distribution
+   int64_t WalleniusNCHyp (int64_t n, int64_t m, int64_t N, double odds); // Wallenius noncentral hypergeometric distribution
+   int64_t FishersNCHyp (int64_t n, int64_t m, int64_t N, double odds); // Fisher's noncentral hypergeometric distribution
+   void MultiWalleniusNCHyp (int64_t * destination, int64_t * source, double * weights, int64_t n, int64_t colors); // Multivariate Wallenius noncentral hypergeometric distribution
+   void MultiComplWalleniusNCHyp (int64_t * destination, int64_t * source, double * weights, int64_t n, int64_t colors); // Multivariate complementary Wallenius noncentral hypergeometric distribution
+   void MultiFishersNCHyp (int64_t * destination, int64_t * source, double * weights, int64_t n, int64_t colors); // Multivariate Fisher's noncentral hypergeometric distribution
    // subfunctions for each approximation method
 protected:
-   int32_t WalleniusNCHypUrn (int32_t n, int32_t m, int32_t N, double odds); // WalleniusNCHyp by urn model
-   int32_t WalleniusNCHypInversion (int32_t n, int32_t m, int32_t N, double odds); // WalleniusNCHyp by inversion method
-   int32_t WalleniusNCHypTable (int32_t n, int32_t m, int32_t N, double odds); // WalleniusNCHyp by table method
-   int32_t WalleniusNCHypRatioOfUnifoms (int32_t n, int32_t m, int32_t N, double odds); // WalleniusNCHyp by ratio-of-uniforms
-   int32_t FishersNCHypInversion (int32_t n, int32_t m, int32_t N, double odds); // FishersNCHyp by inversion
-   int32_t FishersNCHypRatioOfUnifoms (int32_t n, int32_t m, int32_t N, double odds); // FishersNCHyp by ratio-of-uniforms
+   int64_t WalleniusNCHypUrn (int64_t n, int64_t m, int64_t N, double odds); // WalleniusNCHyp by urn model
+   int64_t WalleniusNCHypInversion (int64_t n, int64_t m, int64_t N, double odds); // WalleniusNCHyp by inversion method
+   int64_t WalleniusNCHypTable (int64_t n, int64_t m, int64_t N, double odds); // WalleniusNCHyp by table method
+   int64_t WalleniusNCHypRatioOfUnifoms (int64_t n, int64_t m, int64_t N, double odds); // WalleniusNCHyp by ratio-of-uniforms
+   int64_t FishersNCHypInversion (int64_t n, int64_t m, int64_t N, double odds); // FishersNCHyp by inversion
+   int64_t FishersNCHypRatioOfUnifoms (int64_t n, int64_t m, int64_t N, double odds); // FishersNCHyp by ratio-of-uniforms
 
    // variables
    double accuracy;                                        // desired accuracy of calculations
 
    // Variables for Fisher
-   int32_t fnc_n_last, fnc_m_last, fnc_N_last;             // last values of parameters
-   int32_t fnc_bound;                                      // upper bound
+   int64_t fnc_n_last, fnc_m_last, fnc_N_last;             // last values of parameters
+   int64_t fnc_bound;                                      // upper bound
    double fnc_o_last;
    double fnc_f0, fnc_scale;
    double fnc_a;                                           // hat center
@@ -422,18 +422,18 @@ protected:
    double fnc_logb;                                        // ln(odds)
 
    // variables for Wallenius
-   int32_t wnc_n_last, wnc_m_last, wnc_N_last;             // previous parameters
+   int64_t wnc_n_last, wnc_m_last, wnc_N_last;             // previous parameters
    double wnc_o_last;
-   int32_t wnc_bound1, wnc_bound2;                         // lower and upper bound
-   int32_t wnc_mode;                                       // mode
+   int64_t wnc_bound1, wnc_bound2;                         // lower and upper bound
+   int64_t wnc_mode;                                       // mode
    double wnc_a;                                           // hat center
    double wnc_h;                                           // hat width
    double wnc_k;                                           // probability value at mode
-   int UseChopDown;                                        // use chop down inversion instead
+   int64_t UseChopDown;                                        // use chop down inversion instead
    #define WALL_TABLELENGTH  512                           // max length of table
    double wall_ytable[WALL_TABLELENGTH];                   // table of probability values
-   int32_t wall_tablen;                                    // length of table
-   int32_t wall_x1;                                        // lower x limit for table
+   int64_t wall_tablen;                                    // length of table
+   int64_t wall_x1;                                        // lower x limit for table
 };
 
 
@@ -445,15 +445,15 @@ class CWalleniusNCHypergeometric {
    // This class contains methods for calculating the univariate
    // Wallenius' noncentral hypergeometric probability function
 public:
-   CWalleniusNCHypergeometric(int32_t n, int32_t m, int32_t N, double odds, double accuracy=1.E-8); // constructor
-   void SetParameters(int32_t n, int32_t m, int32_t N, double odds); // change parameters
-   double probability(int32_t x);                          // calculate probability function
-   int32_t MakeTable(double * table, int32_t MaxLength, int32_t * xfirst, int32_t * xlast, double cutoff = 0.); // make table of probabilities
+   CWalleniusNCHypergeometric(int64_t n, int64_t m, int64_t N, double odds, double accuracy=1.E-8); // constructor
+   void SetParameters(int64_t n, int64_t m, int64_t N, double odds); // change parameters
+   double probability(int64_t x);                          // calculate probability function
+   int64_t MakeTable(double * table, int64_t MaxLength, int64_t * xfirst, int64_t * xlast, double cutoff = 0.); // make table of probabilities
    double mean(void);                                      // approximate mean
    double variance(void);                                  // approximate variance (poor approximation)
-   int32_t mode(void);                                     // calculate mode
+   int64_t mode(void);                                     // calculate mode
    double moments(double * mean, double * var);            // calculate exact mean and variance
-   int BernouilliH(int32_t x, double h, double rh, StochasticLib1 *sto); // used by rejection method
+   int64_t BernouilliH(int64_t x, double h, double rh, StochasticLib1 *sto); // used by rejection method
 
    // implementations of different calculation methods
 protected:
@@ -470,15 +470,15 @@ protected:
 
    // parameters
    double omega;                                           // Odds
-   int32_t n, m, N, x;                                     // Parameters
-   int32_t xmin, xmax;                                     // Minimum and maximum x
+   int64_t n, m, N, x;                                     // Parameters
+   int64_t xmin, xmax;                                     // Minimum and maximum x
    double accuracy;                                        // Desired precision
    // parameters used by lnbico
-   int32_t xLastBico;
+   int64_t xLastBico;
    double bico, mFac, xFac;
    // parameters generated by findpars and used by probability, laplace, integrate:
    double r, rd, w, wr, E, phi2d;
-   int32_t xLastFindpars;
+   int64_t xLastFindpars;
 };
 
 
@@ -490,9 +490,9 @@ class CMultiWalleniusNCHypergeometric {
    // This class encapsulates the different methods for calculating the
    // multivariate Wallenius noncentral hypergeometric probability function
 public:
-   CMultiWalleniusNCHypergeometric(int32_t n, int32_t * m, double * odds, int colors, double accuracy=1.E-8); // constructor
-   void SetParameters(int32_t n, int32_t * m, double * odds, int colors); // change parameters
-   double probability(int32_t * x);                        // calculate probability function
+   CMultiWalleniusNCHypergeometric(int64_t n, int64_t * m, double * odds, int64_t colors, double accuracy=1.E-8); // constructor
+   void SetParameters(int64_t n, int64_t * m, double * odds, int64_t colors); // change parameters
+   double probability(int64_t * x);                        // calculate probability function
    void mean(double * mu);                                 // calculate approximate mean
 
       // implementations of different calculation methods
@@ -510,12 +510,12 @@ protected:
    // parameters
    double * omega;                                         // odds
    double accuracy;                                        // desired accuracy
-   int32_t n;                                              // sample size
-   int32_t N;                                              // total items in urn
-   int32_t * m;                                            // items of each color in urn
-   int32_t * x;                                            // items of each color sampled
-   int colors;                                             // number of different colors
-   int Dummy_align;                                        // filler
+   int64_t n;                                              // sample size
+   int64_t N;                                              // total items in urn
+   int64_t * m;                                            // items of each color in urn
+   int64_t * x;                                            // items of each color sampled
+   int64_t colors;                                             // number of different colors
+   int64_t Dummy_align;                                        // filler
    // parameters generated by findpars and used by probability, laplace, integrate:
    double r, rd, w, wr, E, phi2d;
    // generated by lnbico
@@ -532,20 +532,20 @@ class CMultiWalleniusNCHypergeometricMoments: public CMultiWalleniusNCHypergeome
    // Wallenius noncentral hypergeometric distribution by calculating all the 
    // possible x-combinations with probability < accuracy
 public:
-   CMultiWalleniusNCHypergeometricMoments(int32_t n, int32_t * m, double * odds, int colors, double accuracy=1.E-8) 
+   CMultiWalleniusNCHypergeometricMoments(int64_t n, int64_t * m, double * odds, int64_t colors, double accuracy=1.E-8) 
       : CMultiWalleniusNCHypergeometric(n, m, odds, colors, accuracy) {};
-   double moments(double * mean, double * stddev, int32_t * combinations = 0);
+   double moments(double * mean, double * stddev, int64_t * combinations = 0);
 
 protected:
    // functions used internally
-   double loop(int32_t n, int c);                          // recursive loops
+   double loop(int64_t n, int64_t c);                          // recursive loops
    // data
-   int32_t xi[MAXCOLORS];                                  // x vector to calculate probability of
-   int32_t xm[MAXCOLORS];                                  // rounded approximate mean of x[i]
-   int32_t remaining[MAXCOLORS];                           // number of balls of color > c in urn
+   int64_t xi[MAXCOLORS];                                  // x vector to calculate probability of
+   int64_t xm[MAXCOLORS];                                  // rounded approximate mean of x[i]
+   int64_t remaining[MAXCOLORS];                           // number of balls of color > c in urn
    double sx[MAXCOLORS];                                   // sum of x*f(x)
    double sxx[MAXCOLORS];                                  // sum of x^2*f(x)
-   int32_t sn;                                             // number of combinations
+   int64_t sn;                                             // number of combinations
 };
 
 
@@ -557,31 +557,31 @@ class CFishersNCHypergeometric {
    // This class contains methods for calculating the univariate Fisher's
    // noncentral hypergeometric probability function
 public:
-   CFishersNCHypergeometric(int32_t n, int32_t m, int32_t N, double odds, double accuracy = 1E-8); // constructor
-   double probability(int32_t x);                          // calculate probability function
-   double probabilityRatio(int32_t x, int32_t x0);         // calculate probability f(x)/f(x0)
-   double MakeTable(double * table, int32_t MaxLength, int32_t * xfirst, int32_t * xlast, double cutoff = 0.); // make table of probabilities
+   CFishersNCHypergeometric(int64_t n, int64_t m, int64_t N, double odds, double accuracy = 1E-8); // constructor
+   double probability(int64_t x);                          // calculate probability function
+   double probabilityRatio(int64_t x, int64_t x0);         // calculate probability f(x)/f(x0)
+   double MakeTable(double * table, int64_t MaxLength, int64_t * xfirst, int64_t * xlast, double cutoff = 0.); // make table of probabilities
    double mean(void);                                      // calculate approximate mean
    double variance(void);                                  // approximate variance
-   int32_t mode(void);                                     // calculate mode (exact)
+   int64_t mode(void);                                     // calculate mode (exact)
    double moments(double * mean, double * var);            // calculate exact mean and variance
 
 protected:
-   double lng(int32_t x);                                  // natural log of proportional function
+   double lng(int64_t x);                                  // natural log of proportional function
 
    // parameters
    double odds;                                            // odds ratio
    double logodds;                                         // ln odds ratio
    double accuracy;                                        // accuracy
-   int32_t n, m, N;                                        // Parameters
-   int32_t xmin, xmax;                                     // minimum and maximum of x
+   int64_t n, m, N;                                        // Parameters
+   int64_t xmin, xmax;                                     // minimum and maximum of x
 
    // parameters used by subfunctions
-   int32_t xLast;
+   int64_t xLast;
    double mFac, xFac;                                      // log factorials
    double scale;                                           // scale to apply to lng function
    double rsum;                                            // reciprocal sum of proportional function
-   int ParametersChanged;
+   int64_t ParametersChanged;
 };
 
 
@@ -596,20 +596,20 @@ class CMultiFishersNCHypergeometric {
    // probability or moments is proportional to the total number of
    // possible x combinations, which may be extreme!
 public:
-   CMultiFishersNCHypergeometric(int32_t n, int32_t * m, double * odds, int colors, double accuracy = 1E-9); // constructor
-   double probability(int32_t * x);                        // calculate probability function
+   CMultiFishersNCHypergeometric(int64_t n, int64_t * m, double * odds, int64_t colors, double accuracy = 1E-9); // constructor
+   double probability(int64_t * x);                        // calculate probability function
    void mean(double * mu);                                 // calculate approximate mean
    void variance(double * var);                            // calculate approximate variance
-   double moments(double * mean, double * stddev, int32_t * combinations = 0); // calculate exact mean and variance
+   double moments(double * mean, double * stddev, int64_t * combinations = 0); // calculate exact mean and variance
 
 protected:
-   double lng(int32_t * x);                                // natural log of proportional function
+   double lng(int64_t * x);                                // natural log of proportional function
    void SumOfAll(void);                                    // calculates sum of proportional function for all x combinations
-   double loop(int32_t n, int c);                          // recursive loops used by SumOfAll
-   int32_t n, N;                                           // copy of parameters
-   int32_t * m;
+   double loop(int64_t n, int64_t c);                          // recursive loops used by SumOfAll
+   int64_t n, N;                                           // copy of parameters
+   int64_t * m;
    double * odds;
-   int colors;
+   int64_t colors;
    double logodds[MAXCOLORS];                              // log odds
    double mFac;                                            // sum of log m[i]!
    double scale;                                           // scale to apply to lng function
@@ -617,12 +617,12 @@ protected:
    double accuracy;                                        // accuracy of calculation
 
    // data used by used by SumOfAll
-   int32_t xi[MAXCOLORS];                                  // x vector to calculate probability of
-   int32_t xm[MAXCOLORS];                                  // rounded approximate mean of x[i]
-   int32_t remaining[MAXCOLORS];                           // number of balls of color > c in urn
+   int64_t xi[MAXCOLORS];                                  // x vector to calculate probability of
+   int64_t xm[MAXCOLORS];                                  // rounded approximate mean of x[i]
+   int64_t remaining[MAXCOLORS];                           // number of balls of color > c in urn
    double sx[MAXCOLORS];                                   // sum of x*f(x) or mean
    double sxx[MAXCOLORS];                                  // sum of x^2*f(x) or variance
-   int32_t sn;                                             // number of possible combinations of x
+   int64_t sn;                                             // number of possible combinations of x
 };
 
 #endif

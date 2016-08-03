@@ -26,7 +26,7 @@
 
 
 // Output random bits
-uint32_t CRandomMother::BRandom() {
+uint64_t CRandomMother::BRandom() {
   uint64_t sum;
   sum = (uint64_t)2111111111UL * (uint64_t)x[3] +
      (uint64_t)1492 * (uint64_t)(x[2]) +
@@ -34,8 +34,8 @@ uint32_t CRandomMother::BRandom() {
      (uint64_t)5115 * (uint64_t)(x[0]) +
      (uint64_t)x[4];
   x[3] = x[2];  x[2] = x[1];  x[1] = x[0];
-  x[4] = (uint32_t)(sum >> 32);                  // Carry
-  x[0] = (uint32_t)sum;                          // Low 32 bits of sum
+  x[4] = (uint64_t)(sum >> 32);                  // Carry
+  x[0] = (uint64_t)sum;                          // Low 32 bits of sum
   return x[0];
 } 
 
@@ -47,29 +47,29 @@ double CRandomMother::Random() {
 
 
 // returns integer random number in desired interval:
-int CRandomMother::IRandom(int min, int max) {
+int64_t CRandomMother::IRandom(int64_t min, int64_t max) {
    // Output random integer in the interval min <= x <= max
    // Relative error on frequencies < 2^-32
    if (max <= min) {
       if (max == min) return min; else return 0x80000000;
    }
    // Assume 64 bit integers supported. Use multiply and shift method
-   uint32_t interval;                  // Length of interval
+   uint64_t interval;                  // Length of interval
    uint64_t longran;                   // Random bits * interval
-   uint32_t iran;                      // Longran / 2^32
+   uint64_t iran;                      // Longran / 2^32
 
-   interval = (uint32_t)(max - min + 1);
+   interval = (uint64_t)(max - min + 1);
    longran  = (uint64_t)BRandom() * interval;
-   iran = (uint32_t)(longran >> 32);
+   iran = (uint64_t)(longran >> 32);
    // Convert back to signed and return result
-   return (int32_t)iran + min;
+   return (int64_t)iran + min;
 }
 
 
 // this function initializes the random number generator:
-void CRandomMother::RandomInit (int seed) {
-  int i;
-  uint32_t s = seed;
+void CRandomMother::RandomInit (int64_t seed) {
+  int64_t i;
+  uint64_t s = seed;
   // make random numbers and put them into the buffer
   for (i = 0; i < 5; i++) {
     s = s * 29943829 - 1;

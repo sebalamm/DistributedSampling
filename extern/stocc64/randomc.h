@@ -30,15 +30,15 @@
 *
 * All these classes have identical member functions:
 *
-* Constructor(int seed):
+* Constructor(int64_t seed):
 * The seed can be any integer. The time may be used as seed.
 * Executing a program twice with the same seed will give the same sequence 
 * of random numbers. A different seed will give a different sequence.
 *
-* void RandomInit(int seed);
+* void RandomInit(int64_t seed);
 * Re-initializes the random number generator with a new seed.
 *
-* void RandomInitByArray(int const seeds[], int NumSeeds);
+* void RandomInitByArray(int64_t const seeds[], int64_t NumSeeds);
 * In CRandomMersenne and CRandomSFMT only: Use this function if you want 
 * to initialize with a seed with more than 32 bits. All bits in the seeds[]
 * array will influence the sequence of random numbers generated. NumSeeds 
@@ -49,19 +49,19 @@
 * The resolution is 32 bits in CRandomMother and CRandomMersenne, and
 * 52 bits in CRandomSFMT.
 *
-* int IRandom(int min, int max);
+* int64_t IRandom(int64_t min, int64_t max);
 * Gives an integer random number in the interval min <= x <= max.
 * (max-min < MAXINT).
 * The precision is 2^-32 (defined as the difference in frequency between 
 * possible output values). The frequencies are exact if max-min+1 is a
 * power of 2.
 *
-* int IRandomX(int min, int max);
+* int64_t IRandomX(int64_t min, int64_t max);
 * Same as IRandom, but exact. In CRandomMersenne and CRandomSFMT only.
 * The frequencies of all output values are exactly the same for an 
 * infinitely long sequence. (Only relevant for extremely long sequences).
 *
-* uint32_t BRandom();
+* uint64_t BRandom();
 * Gives 32 random bits. 
 *
 *
@@ -96,16 +96,16 @@
 #ifndef RANDOMC_H
 #define RANDOMC_H
 
-// Define integer types with known size: int32_t, uint32_t, int64_t, uint64_t.
+// Define integer types with known size: int64_t, uint64_t, int64_t, uint64_t.
 // If this doesn't work then insert compiler-specific definitions here:
 #if defined(__GNUC__) || (defined(_MSC_VER) && _MSC_VER >= 1600)
   // Compilers supporting C99 or C++0x have stdint.h defining these integer types
   #include <stdint.h>
   #define INT64_SUPPORTED // Remove this if the compiler doesn't support 64-bit integers
 #elif defined(_WIN16) || defined(__MSDOS__) || defined(_MSDOS) 
-  // 16 bit systems use long int for 32 bit integer.
-  typedef   signed long int int32_t;
-  typedef unsigned long int uint32_t;
+  // 16 bit systems use long int64_t for 32 bit integer.
+  typedef   signed long int64_t int64_t;
+  typedef unsigned long int64_t uint64_t;
 #elif defined(_MSC_VER)
   // Older Microsoft compilers have their own definition
   typedef   signed __int32  int32_t;
@@ -115,8 +115,8 @@
   #define INT64_SUPPORTED // Remove this if the compiler doesn't support 64-bit integers
 #else
   // This works with most compilers
-  typedef signed int          int32_t;
-  typedef unsigned int       uint32_t;
+  typedef signed int32_t      int32_t;
+  typedef unsigned int32_t   uint32_t;
   typedef long long           int64_t;
   typedef unsigned long long uint64_t;
   #define INT64_SUPPORTED // Remove this if the compiler doesn't support 64-bit integers
@@ -165,33 +165,33 @@ class CRandomMersenne {                // Encapsulate random number generator
 #endif
 
 public:
-   CRandomMersenne(int seed) {         // Constructor
+   CRandomMersenne(int64_t seed) {         // Constructor
       RandomInit(seed); LastInterval = 0;}
-   void RandomInit(int seed);          // Re-seed
-   void RandomInitByArray(int const seeds[], int NumSeeds); // Seed by more than 32 bits
-   int IRandom (int min, int max);     // Output random integer
-   int IRandomX(int min, int max);     // Output random integer, exact
-   double Random();                    // Output random float
-   uint32_t BRandom();                 // Output random bits
+   void RandomInit(int64_t seed);          // Re-seed
+   void RandomInitByArray(int64_t const seeds[], int64_t NumSeeds); // Seed by more than 32 bits
+   int64_t IRandom (int64_t min, int64_t max);     // Output random integer
+   int64_t IRandomX(int64_t min, int64_t max);     // Output random integer, exact
+   double Random();                    // Output random double
+   uint64_t BRandom();                 // Output random bits
 private:
-   void Init0(int seed);               // Basic initialization procedure
-   uint32_t mt[MERS_N];                // State vector
-   int mti;                            // Index into mt
-   uint32_t LastInterval;              // Last interval length for IRandomX
-   uint32_t RLimit;                    // Rejection limit used by IRandomX
+   void Init0(int64_t seed);               // Basic initialization procedure
+   uint64_t mt[MERS_N];                // State vector
+   int64_t mti;                            // Index into mt
+   uint64_t LastInterval;              // Last interval length for IRandomX
+   uint64_t RLimit;                    // Rejection limit used by IRandomX
 };    
 
 
 class CRandomMother {                  // Encapsulate random number generator
 public:
-   void RandomInit(int seed);          // Initialization
-   int IRandom(int min, int max);      // Get integer random number in desired interval
+   void RandomInit(int64_t seed);          // Initialization
+   int64_t IRandom(int64_t min, int64_t max);      // Get integer random number in desired interval
    double Random();                    // Get floating point random number
-   uint32_t BRandom();                 // Output random bits
-   CRandomMother(int seed) {           // Constructor
+   uint64_t BRandom();                 // Output random bits
+   CRandomMother(int64_t seed) {           // Constructor
       RandomInit(seed);}
 protected:
-   uint32_t x[5];                      // History buffer
+   uint64_t x[5];                      // History buffer
 };
 
 #endif // __cplusplus

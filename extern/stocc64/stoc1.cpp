@@ -49,7 +49,7 @@ double LnFac(int64_t n) {
    // C7 = -1./1680.;                  // use r^7 term if FAK_LEN < 20
    // static variables
    static double fac_table[FAK_LEN];   // table of ln(n!):
-   static int initialized = 0;         // remember if fac_table has been initialized
+   static int64_t initialized = 0;         // remember if fac_table has been initialized
 
    if (n < FAK_LEN) {
       if (n <= 1) {
@@ -59,7 +59,7 @@ double LnFac(int64_t n) {
       if (!initialized) {              // first time. Must initialize table
          // make table of ln(n!)
          double sum = fac_table[0] = 0.;
-         for (int i=1; i<FAK_LEN; i++) {
+         for (int64_t i=1; i<FAK_LEN; i++) {
             sum += log(double(i));
             fac_table[i] = sum;
          }
@@ -77,7 +77,7 @@ double LnFac(int64_t n) {
 /***********************************************************************
 Constructor
 ***********************************************************************/
-StochasticLib1::StochasticLib1 (int seed)
+StochasticLib1::StochasticLib1 (int64_t seed)
 : STOC_BASE(seed) {
    // Initialize variables for various distributions
    normal_x2_valid = 0;
@@ -309,7 +309,7 @@ double StochasticLib1::fc_lnpk(int64_t k, int64_t L, int64_t m, int64_t n) {
 /***********************************************************************
 Multivariate hypergeometric distribution
 ***********************************************************************/
-void StochasticLib1::MultiHypergeometric (int32_t * destination, int32_t * source, int32_t n, int colors) {
+void StochasticLib1::MultiHypergeometric (int64_t * destination, int64_t * source, int64_t n, int64_t colors) {
    /*
    This function generates a vector of random variates, each with the
    hypergeometric distribution.
@@ -328,8 +328,8 @@ void StochasticLib1::MultiHypergeometric (int32_t * destination, int32_t * sourc
    Can't exceed the total number of balls in the urn.
    colors:         The number of possible colors. 
    */
-   int32_t sum, x, y;
-   int i;
+   int64_t sum, x, y;
+   int64_t i;
    if (n < 0 || colors < 0) FatalError("Parameter negative in multihypergeo function");
    if (colors == 0) return;
 
@@ -356,7 +356,7 @@ void StochasticLib1::MultiHypergeometric (int32_t * destination, int32_t * sourc
 /***********************************************************************
 Poisson distribution
 ***********************************************************************/
-int32_t StochasticLib1::Poisson (double L) {
+int64_t StochasticLib1::Poisson (double L) {
    /*
    This function generates a random variate with the poisson distribution.
 
@@ -410,7 +410,7 @@ int32_t StochasticLib1::Poisson (double L) {
 /***********************************************************************
 Subfunctions used by poisson
 ***********************************************************************/
-int32_t StochasticLib1::PoissonLow(double L) {
+int64_t StochasticLib1::PoissonLow(double L) {
    /*
    This subfunction generates a random variate with the poisson 
    distribution for extremely low values of L.
@@ -431,7 +431,7 @@ int32_t StochasticLib1::PoissonLow(double L) {
 }
 
 
-int32_t StochasticLib1::PoissonInver(double L) {
+int64_t StochasticLib1::PoissonInver(double L) {
    /*
    This subfunction generates a random variate with the poisson 
    distribution using inversion by the chop down method (PIN).
@@ -440,10 +440,10 @@ int32_t StochasticLib1::PoissonInver(double L) {
 
    The value of bound must be adjusted to the maximal value of L.
    */   
-   const int bound = 130;              // safety bound. Must be > L + 8*sqrt(L).
+   const int64_t bound = 130;              // safety bound. Must be > L + 8*sqrt(L).
    double r;                           // uniform random number
    double f;                           // function value
-   int32_t x;                          // return value
+   int64_t x;                          // return value
 
    if (L != pois_L_last) {             // set up
       pois_L_last = L;
@@ -463,7 +463,7 @@ int32_t StochasticLib1::PoissonInver(double L) {
 }  
 
 
-int32_t StochasticLib1::PoissonRatioUniforms(double L) {
+int64_t StochasticLib1::PoissonRatioUniforms(double L) {
    /*
    This subfunction generates a random variate with the poisson 
    distribution using the ratio-of-uniforms rejection method (PRUAt).
@@ -478,23 +478,23 @@ int32_t StochasticLib1::PoissonRatioUniforms(double L) {
    double u;                                          // uniform random
    double lf;                                         // ln(f(x))
    double x;                                          // real sample
-   int32_t k;                                         // integer sample
+   int64_t k;                                         // integer sample
 
    if (pois_L_last != L) {
       pois_L_last = L;                                // Set-up
       pois_a = L + 0.5;                               // hat center
-      int32_t mode = (int32_t)L;                      // mode
+      int64_t mode = (int64_t)L;                      // mode
       pois_g  = log(L);
       pois_f0 = mode * pois_g - LnFac(mode);          // value at mode
       pois_h = sqrt(SHAT1 * (L+0.5)) + SHAT2;         // hat width
-      pois_bound = (int32_t)(pois_a + 6.0 * pois_h);  // safety-bound
+      pois_bound = (int64_t)(pois_a + 6.0 * pois_h);  // safety-bound
    }
    while(1) {
       u = Random();
       if (u == 0) continue;                           // avoid division by 0
       x = pois_a + pois_h * (Random() - 0.5) / u;
       if (x < 0 || x >= pois_bound) continue;         // reject if outside valid range
-      k = (int32_t)(x);
+      k = (int64_t)(x);
       lf = k * pois_g - LnFac(k) - pois_f0;
       if (lf >= u * (4.0 - u) - 3.0) break;           // quick acceptance
       if (u * (u - lf) > 1.0) continue;               // quick rejection
@@ -516,7 +516,7 @@ int64_t StochasticLib1::Binomial (int64_t n, double p) {
 
    For n*p < 1.E-6 numerical inaccuracy is avoided by poisson approximation.
    */
-   int inv = 0;                        // invert
+   int64_t inv = 0;                        // invert
    int64_t x;                          // result
    double np = n * p;
 
@@ -659,7 +659,7 @@ int64_t StochasticLib1::BinomialRatioOfUniforms (int64_t n, double p) {
 /***********************************************************************
 Multinomial distribution
 ***********************************************************************/
-void StochasticLib1::Multinomial (int32_t * destination, double * source, int32_t n, int colors) {
+void StochasticLib1::Multinomial (int64_t * destination, double * source, int64_t n, int64_t colors) {
    /*
    This function generates a vector of random variates, each with the
    binomial distribution.
@@ -678,8 +678,8 @@ void StochasticLib1::Multinomial (int32_t * destination, double * source, int32_
    colors:         The number of possible colors. 
    */
    double s, sum;
-   int32_t x;
-   int i;
+   int64_t x;
+   int64_t i;
    if (n < 0 || colors < 0) FatalError("Parameter negative in multinomial function");
    if (colors == 0) return;
 
@@ -711,10 +711,10 @@ void StochasticLib1::Multinomial (int32_t * destination, double * source, int32_
 }
 
 
-void StochasticLib1::Multinomial (int32_t * destination, int32_t * source, int32_t n, int colors) {
+void StochasticLib1::Multinomial (int64_t * destination, int64_t * source, int64_t n, int64_t colors) {
    // same as above, with integer source
-   int32_t x, p, sum;
-   int i;
+   int64_t x, p, sum;
+   int64_t i;
    if (n < 0 || colors < 0) FatalError("Parameter negative in multinomial function");
    if (colors == 0) return;
 
@@ -782,7 +782,7 @@ double StochasticLib1::NormalTrunc(double m, double s, double limit) {
 /***********************************************************************
 Bernoulli distribution
 ***********************************************************************/
-int StochasticLib1::Bernoulli(double p) {
+int64_t StochasticLib1::Bernoulli(double p) {
    // Bernoulli distribution with parameter p. This function returns 
    // 0 or 1 with probability (1-p) and p, respectively.
    if (p < 0 || p > 1) FatalError("Parameter out of range in Bernoulli function");
@@ -793,7 +793,7 @@ int StochasticLib1::Bernoulli(double p) {
 /***********************************************************************
 Shuffle function
 ***********************************************************************/
-void StochasticLib1::Shuffle(int * list, int min, int n) {
+void StochasticLib1::Shuffle(int64_t * list, int64_t min, int64_t n) {
    /*
    This function makes a list of the n numbers from min to min+n-1
    in random order.
@@ -805,7 +805,7 @@ void StochasticLib1::Shuffle(int * list, int min, int n) {
    integers in list as an index into a table of the items you want to shuffle.
    */
 
-   int i, j, swap;
+   int64_t i, j, swap;
    // put numbers from min to min+n-1 into list
    for (i=0, j=min; i<n; i++, j++) list[i] = j;
    // shuffle list
