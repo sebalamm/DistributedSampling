@@ -41,8 +41,7 @@ class Spooky {
     public:
         static ULONG hash(ULONG x) {
 #ifdef ENV64BIT 
-            // ULONG hash = SpookyHash::Hash64(&x, 8, SEEDA);
-            ULONG hash = SpookyHash::Hash32(&x, 4, SEEDA);
+            ULONG hash = SpookyHash::Hash64(&x, 8, SEEDA);
 #else
             ULONG hash = SpookyHash::Hash32(&x, 4, SEEDA);
 #endif

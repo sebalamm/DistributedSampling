@@ -1,5 +1,5 @@
 /******************************************************************************
- * run_methodD.cpp 
+ * run_methodSH.cpp 
  *
  * Source of the sampling routine
  ******************************************************************************
@@ -22,12 +22,13 @@
 #include <argtable2.h>
 
 #include <vector>
+#include <algorithm>
 
 #include "timer.h"
 #include "macros_assertions.h"
 #include "parse_parameters.h"
 #include "sampling_config.h"
-#include "sampling/methodD.h"
+#include "sampling/methodSH.h"
 #include "tools/benchmark.h"
 
 int main(int argn, char **argv) {
@@ -60,13 +61,16 @@ int main(int argn, char **argv) {
         sample.clear();
 
         // Compute sample
-        Vitter<> vi(config.seed + iteration);
-        vi.sample(config.N,
+        SortedHashSampling<> hs(iteration, config.n);
+        hs.sample(config.N,
                   config.n,
                   [&](ULONG elem) {
                       // fprintf(fp, "%lld\n", elem);
                       sample.push_back(elem);
                   });
+
+        if (!std::is_sorted(sample.begin(), sample.end())) std::cout << "not sorted!" << std::endl;
+        if (sample.size() != config.n) std::cout << "wrong size " << sample.size() << "!" << std::endl;
     }
 
     std::cout << "measurements" << std::endl;
@@ -75,8 +79,8 @@ int main(int argn, char **argv) {
         t.restart();
 
         // Compute sample
-        Vitter<> vi(config.seed + iteration);
-        vi.sample(config.N,
+        SortedHashSampling<> hs(config.seed + iteration, config.n);
+        hs.sample(config.N,
                   config.n,
                   [&](ULONG elem) {
                       // fprintf(fp, "%lld\n", elem);
@@ -87,11 +91,11 @@ int main(int argn, char **argv) {
         stats.push(time);    
     }
 
-    std::cout << "RESULT runner=D" 
+    std::cout << "RESULT runner=H" 
               << " time=" << stats.avg()
               << " stddev=" << stats.stddev()
               << " iterations=" << config.iterations << std::endl;
-    fprintf(fp, "RESULT runner=D time=%f stddev=%f iterations=%llu\n", stats.avg(), stats.stddev(), config.iterations);
+    fprintf(fp, "RESULT runner=H time=%f stddev=%f iterations=%llu\n", stats.avg(), stats.stddev(), config.iterations);
     fclose(fp);
 }
 
