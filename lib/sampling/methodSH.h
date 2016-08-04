@@ -46,6 +46,10 @@ class SortedHashSampling {
         SortedHashSampling(ULONG seed, ULONG n) { 
             // Modification: dSFMT
             dsfmt_init_gen_rand(&dsfmt, seed);
+            curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
+            curr_blocksize += (curr_blocksize & 0x1); // needs to be even
+            randblock.reserve(curr_blocksize);
+
             resizeTable(n);
         }
 
@@ -72,8 +76,7 @@ class SortedHashSampling {
             // Modification: dSFMT
             ULONG curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
             curr_blocksize += (curr_blocksize & 0x1); // needs to be even
-            double *randblock = new double[curr_blocksize];
-            dsfmt_fill_array_open_close(&dsfmt, randblock, curr_blocksize);
+            dsfmt_fill_array_open_close(&dsfmt, &(randblock[0]), curr_blocksize);
             ULONG array_index = 0;
             // Modification: End
 
@@ -86,7 +89,7 @@ class SortedHashSampling {
                         curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
                         curr_blocksize += (curr_blocksize & 0x1); // needs to be even
                         // delete[] randblock; randblock = new double[curr_blocksize];
-                        dsfmt_fill_array_open_close(&dsfmt, randblock, curr_blocksize);
+                        dsfmt_fill_array_open_close(&dsfmt, &(randblock[0]), curr_blocksize);
                         array_index = 0;
                     }
                     variate = N * randblock[array_index++];
@@ -119,13 +122,15 @@ increment:
                 n--;
             }
 
-             // Condense
-             ULONG i = 0;
-             ULONG j = 0;
-             while (i < orig_n) {
-                 while (*(offset + j) == dummy) j++;
-                 *(offset + i) = *(offset + j); i++; j++;
-             }
+            // Condense
+            ULONG i = 0;
+            ULONG j = 0;
+            while (i < orig_n) {
+                while (*(offset + j) == dummy) j++;
+                *(offset + i) = *(offset + j); 
+                if (i != j) *(offset + j) = dummy;
+                i++; j++;
+            }
 
             // Exchange sort
             // ULONG tmp;   
@@ -153,7 +158,6 @@ increment:
                 callback(*(offset + i) + 1);
                 *(offset + i) = dummy;
             }
-
         }
 
         void clear() {
@@ -166,7 +170,9 @@ increment:
         dsfmt_t dsfmt;
 
         std::vector<ULONG> hash_table;
-        ULONG table_lg, table_size;
+        std::vector<double> randblock;
+
+        ULONG table_lg, table_size, curr_blocksize;
         ULONG *offset;
         ULONG orig_n;
 
