@@ -46,9 +46,9 @@ class SortedHashSampling {
         SortedHashSampling(ULONG seed, ULONG n) { 
             // Modification: dSFMT
             dsfmt_init_gen_rand(&dsfmt, seed);
-            curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
-            curr_blocksize += (curr_blocksize & 0x1); // needs to be even
-            randblock.reserve(curr_blocksize);
+            max_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
+            max_blocksize += (max_blocksize & 0x1); // needs to be even
+            randblock.reserve(max_blocksize);
 
             resizeTable(n);
         }
@@ -76,6 +76,7 @@ class SortedHashSampling {
             // Modification: dSFMT
             ULONG curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
             curr_blocksize += (curr_blocksize & 0x1); // needs to be even
+            curr_blocksize = std::min(curr_blocksize, max_blocksize);
             dsfmt_fill_array_open_close(&dsfmt, &(randblock[0]), curr_blocksize);
             ULONG array_index = 0;
             // Modification: End
@@ -88,7 +89,7 @@ class SortedHashSampling {
                     if (array_index >= curr_blocksize) {
                         curr_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
                         curr_blocksize += (curr_blocksize & 0x1); // needs to be even
-                        // delete[] randblock; randblock = new double[curr_blocksize];
+                        curr_blocksize = std::min(curr_blocksize, max_blocksize);
                         dsfmt_fill_array_open_close(&dsfmt, &(randblock[0]), curr_blocksize);
                         array_index = 0;
                     }
@@ -172,7 +173,7 @@ increment:
         std::vector<ULONG> hash_table;
         std::vector<double> randblock;
 
-        ULONG table_lg, table_size, curr_blocksize;
+        ULONG table_lg, table_size, max_blocksize;
         ULONG *offset;
         ULONG orig_n;
 
