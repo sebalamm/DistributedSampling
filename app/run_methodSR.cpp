@@ -61,8 +61,8 @@ int main(int argn, char **argv) {
         sample.clear();
 
         // Compute sample
-        HashSampling<> hs(config.seed + iteration, config.k);
-        SeqDivideSampling<> sds(hs, config.k, config.seed + iteration);
+        SortedHashSampling<> hs(config.seed + iteration, config.k);
+        SeqDivideSampling<StochasticLib1, SortedHashSampling<>> sds(hs, config.k, config.seed + iteration);
         sds.sample(config.N,
                    config.n,
                    [&](ULONG elem) {
@@ -71,7 +71,7 @@ int main(int argn, char **argv) {
                    });
 
         
-        // if (!std::is_sorted(sample.begin(), sample.end())) std::cout << "not sorted!" << std::endl;
+        if (!std::is_sorted(sample.begin(), sample.end())) std::cout << "not sorted!" << std::endl;
         if (sample.size() != config.n) std::cout << "wrong size " << sample.size() << "!" << std::endl;
     }
 
@@ -81,8 +81,8 @@ int main(int argn, char **argv) {
         t.restart();
 
         // Compute sample
-        HashSampling<> hs(config.seed + iteration, config.k);
-        SeqDivideSampling<> sds(hs, config.k, config.seed + iteration);
+        SortedHashSampling<> hs(config.seed + iteration, config.k);
+        SeqDivideSampling<StochasticLib1, SortedHashSampling<>> sds(hs, config.k, config.seed + iteration);
         sds.sample(config.N,
                    config.n,
                    [&](ULONG elem) {
@@ -90,9 +90,6 @@ int main(int argn, char **argv) {
                        sample.push_back(elem);
                    });
 
-        for (ULONG i = 1; i < sample.size(); i++) {
-            if (sample[i] == sample[i-1]) std::cout << "duplicates!" << std::endl;
-        }
         double time = t.elapsed();
         stats.push(time);    
     }

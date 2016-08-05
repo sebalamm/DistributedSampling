@@ -108,10 +108,13 @@ int main(int argn, char **argv) {
 
     if (rank == ROOT) {
         std::cout << "RESULT runner=P" 
+                  << " n=" << config.n
+                  << " N=" << config.N
+                  << " p=" << size
                   << " time=" << stats.avg()
                   << " stddev=" << stats.stddev()
                   << " iterations=" << config.iterations << std::endl;
-        fprintf(fp, "RESULT runner=P time=%f stddev=%f iterations=%llu\n", stats.avg(), stats.stddev(), config.iterations);
+        fprintf(fp, "RESULT runner=P n=%llu N=%llu p=%d time=%f stddev=%f iterations=%llu\n", config.n, config.N, size, stats.avg(), stats.stddev(), config.iterations);
         fclose(fp);
     }
 

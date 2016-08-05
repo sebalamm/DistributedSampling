@@ -73,6 +73,9 @@ if env['program'] == 'run_methodSH':
 if env['program'] == 'run_methodR':
     env.Program('run_methodR', ['app/run_methodR.cpp'], LIBS=['libargtable2','gomp','stocc'])
 
+if env['program'] == 'run_methodSR':
+    env.Program('run_methodSR', ['app/run_methodSR.cpp'], LIBS=['libargtable2','gomp','stocc'])
+
 if env['program'] == 'run_methodP':
     env.Program('run_methodP', ['app/run_methodP.cpp'], LIBS=['libargtable2','gomp','stocc'])
 
