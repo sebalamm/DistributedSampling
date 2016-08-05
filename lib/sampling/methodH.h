@@ -29,7 +29,6 @@
 #include <algorithm>
 
 #include "definitions.h"
-#include "mt_wrapper.h"
 #include "dSFMT.h"
 
 #define LOG2(X) ((unsigned) (8*sizeof (unsigned long long) - __builtin_clzll((X)) - 1))
@@ -40,7 +39,7 @@
 #define likely(x) __builtin_expect((x),1)
 #endif
 
-template <typename RandomGenerator = MTWrapper, ULONG blocksize = (1 << 24), ULONG dummy = std::numeric_limits<ULONG>::max()>
+template <ULONG blocksize = (1 << 24), ULONG dummy = std::numeric_limits<ULONG>::max()>
 class HashSampling {
     public:
         HashSampling(ULONG seed, ULONG n) { 
