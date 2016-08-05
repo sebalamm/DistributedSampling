@@ -40,14 +40,14 @@ HOME = os.environ['HOME']
 def GetEnvironment():
     opts = Variables()
     opts.Add('variant', 'the variant to build', 'optimized')
-    opts.Add('program', 'program or interface to compile', 'library, run_methodD, run_methodH, run_methodR, run_methodP, run_experiments')
+    opts.Add('program', 'program or interface to compile', 'library, run_methodH, run_methodR, run_methodSH, run_experiments')
 
     env = Environment(options=opts, ENV=os.environ)
     if not env['variant'] in ['optimized', 'debug']:
         print 'Illegal value for variant: %s' % env['variant']
         sys.exit(1)
 
-    if not env['program'] in ['library', 'run_methodD', 'run_methodH', 'run_methodR', 'run_methodP', 'run_experiments']:
+    if not env['program'] in ['library', 'run_methodH', 'run_methodR', 'run_methodSH', 'run_experiments']:
         print 'Illegal value for program: %s' % env['program']
         sys.exit(1)
 
@@ -65,10 +65,8 @@ env = GetEnvironment()
 # env.Append(CPPPATH=['./extern/stocc'])
 # env.Append(CPPPATH=['./extern/mersenne'])
 env.Append(LIBPATH=['./optimized'])
-env.Append(CPPPATH=['./extern/stocc64'])
-env.Append(CPPPATH=['./extern/mersenne64'])
-env.Append(CPPPATH=['./extern/spooky'])
-env.Append(CPPPATH=['./extern/city'])
+env.Append(CPPPATH=['./extern/stocc'])
+env.Append(CPPPATH=['./extern/mersenn4'])
 env.Append(CPPPATH=['./extern/dSFMT'])
 env.Append(CPPPATH=['./lib'])
 env.Append(CPPPATH=['./lib/io'])
@@ -116,4 +114,3 @@ else:
 
 # Execute the SConscript.
 SConscript('SConscript', exports=['env'],variant_dir=env['variant'], duplicate=False)
-

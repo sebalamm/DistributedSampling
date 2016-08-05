@@ -36,10 +36,10 @@ Import('env')
 #     env.Append(LINKFLAGS = '-openmp')
 #     env.Append(CXXFLAGS = '-msse4.2 -openmp -w')
 #     env.Append(CCFLAGS = '-msse4.2 -openmp -w')
-# else: 
+# else:
 
-env['CXX'] = 'mpicxx'
-env['CC']  = 'mpicc'
+#env['CXX'] = 'mpicxx'
+#env['CC']  = 'mpicc'
 env.Append(CXXFLAGS = '-msse4.2')
 env.Append(CCFLAGS = '-msse4.2')
 
@@ -49,13 +49,13 @@ if SYSTEM == 'Darwin':
 
 if env['program'] == 'library':
     stocc = env.Library('stocc', [
-        'extern/mersenne64/userintf.cpp',
-        'extern/mersenne64/mersenne.cpp',
-        'extern/stocc64/stoc1.cpp',
-        'extern/stocc64/stoc2.cpp',
-        'extern/stocc64/stoc3.cpp',
-        'extern/stocc64/wnchyppr.cpp',
-        'extern/stocc64/fnchyppr.cpp',
+        'extern/mersenne/userintf.cpp',
+        'extern/mersenne/mersenne.cpp',
+        'extern/stocc/stoc1.cpp',
+        'extern/stocc/stoc2.cpp',
+        'extern/stocc/stoc3.cpp',
+        'extern/stocc/wnchyppr.cpp',
+        'extern/stocc/fnchyppr.cpp',
         # 'extern/mersenne/userintf.cpp',
         # 'extern/mersenne/mersenne.cpp',
         # 'extern/stocc/stoc1.cpp',
@@ -63,13 +63,10 @@ if env['program'] == 'library':
         # 'extern/stocc/stoc3.cpp',
         # 'extern/stocc/wnchyppr.cpp',
         # 'extern/stocc/fnchyppr.cpp',
-        'extern/spooky/spooky.cpp',
-        'extern/city/city.cc',
+        #'extern/spooky/spooky.cpp',
+        #'extern/city/city.cc',
         'extern/dSFMT/dSFMT.c'
     ])
-
-if env['program'] == 'run_methodD':
-    env.Program('run_methodD', ['app/run_methodD.cpp'], LIBS=['libargtable2','gomp','stocc'])
 
 if env['program'] == 'run_methodH':
     env.Program('run_methodH', ['app/run_methodH.cpp'], LIBS=['libargtable2','gomp','stocc'])
@@ -77,9 +74,8 @@ if env['program'] == 'run_methodH':
 if env['program'] == 'run_methodR':
     env.Program('run_methodR', ['app/run_methodR.cpp'], LIBS=['libargtable2','gomp','stocc'])
 
-if env['program'] == 'run_methodP':
-    env.Program('run_methodP', ['app/run_methodP.cpp'], LIBS=['libargtable2','gomp','stocc'])
+if env['program'] == 'run_methodSH':
+    env.Program('run_methodSH', ['app/run_methodSH.cpp'], LIBS=['libargtable2','gomp','stocc'])
 
 if env['program'] == 'run_experiments':
     env.Program('run_experiments', ['app/run_experiments.cpp'], LIBS=['libargtable2','gomp','stocc'])
-
