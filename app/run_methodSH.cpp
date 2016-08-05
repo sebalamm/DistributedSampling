@@ -91,11 +91,11 @@ int main(int argn, char **argv) {
         stats.push(time);    
     }
 
-    std::cout << "RESULT runner=H" 
+    std::cout << "RESULT runner=SH" 
               << " time=" << stats.avg()
               << " stddev=" << stats.stddev()
               << " iterations=" << config.iterations << std::endl;
-    fprintf(fp, "RESULT runner=H time=%f stddev=%f iterations=%llu\n", stats.avg(), stats.stddev(), config.iterations);
+    fprintf(fp, "RESULT runner=SH time=%f stddev=%f iterations=%llu\n", stats.avg(), stats.stddev(), config.iterations);
     fclose(fp);
 }
 
