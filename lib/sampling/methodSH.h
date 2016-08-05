@@ -19,24 +19,22 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
+#pragma once
 
-#ifndef _METHOD_SH_H_
-#define _METHOD_SH_H_
-
-#include <vector>
-#include <limits>
-#include <iterator>
 #include <algorithm>
+#include <iterator>
+#include <limits>
+#include <vector>
 
-#include "definitions.h"
 #include "dSFMT.h"
+#include "definitions.h"
 
-#define LOG2(X) ((unsigned) (8*sizeof (unsigned long long) - __builtin_clzll((X)) - 1))
+#define LOG2(X) ((unsigned)(8 * sizeof(unsigned long long) - __builtin_clzll((X)) - 1))
 #ifndef unlikely
-#define unlikely(x) __builtin_expect((x),0)
+#define unlikely(x) __builtin_expect((x), 0)
 #endif
 #ifndef likely
-#define likely(x) __builtin_expect((x),1)
+#define likely(x) __builtin_expect((x), 1)
 #endif
 
 template <ULONG blocksize = (1 << 24), ULONG dummy = std::numeric_limits<ULONG>::max()>
@@ -64,9 +62,7 @@ public:
 
     // See SH subroutine in Ahrens and Dieter
     template <typename F>
-    void sample(ULONG N,
-                ULONG n,
-                F &&callback) {
+    void sample(ULONG N, ULONG n, F &&callback) {
         ULONG variate, index, hash_elem;
         ULONG population_lg = (LOG2(N) + isNotPowerOfTwo(N));
         ULONG address_mask = (table_lg >= population_lg) ? 0 : population_lg - table_lg;
@@ -99,15 +95,19 @@ public:
                 hash_elem = *(offset + index);
 
                 // Table lookup
-                if (likely(hash_elem == dummy)) break; // done
-                else if (hash_elem == variate) continue; // already sampled
+                if (likely(hash_elem == dummy))
+                    break; // done
+                else if (hash_elem == variate)
+                    continue; // already sampled
                 else {
                 increment:
                     ++index;
                     index &= (table_size - 1);
                     hash_elem = *(offset + index);
-                    if (hash_elem == dummy) break; // done
-                    else if (hash_elem == variate) continue; // already sampled
+                    if (hash_elem == dummy)
+                        break; // done
+                    else if (hash_elem == variate)
+                        continue;   // already sampled
                     goto increment; // keep incrementing
                 }
             }
@@ -120,15 +120,17 @@ public:
         ULONG i = 0;
         ULONG j = 0;
         while (i < orig_n) {
-            while (*(offset + j) == dummy) j++;
+            while (*(offset + j) == dummy)
+                j++;
             *(offset + i) = *(offset + j);
             if (i != j) *(offset + j) = dummy;
-            i++; j++;
+            i++;
+            j++;
         }
 
         // Insertion sort
         ULONG tmp = 0;
-        for(i = 1 ; i < orig_n ; i++) {
+        for (i = 1; i < orig_n; i++) {
             tmp = *(offset + i);
             for (j = i; j > 0 && *(offset + j - 1) > tmp; j--)
                 *(offset + j) = *(offset + j - 1);
@@ -171,7 +173,4 @@ private:
     inline bool isNotPowerOfTwo(ULONG x) {
         return (x & (x - 1)) != 0;
     }
-
 };
-
-#endif
