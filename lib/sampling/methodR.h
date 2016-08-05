@@ -25,44 +25,41 @@
 
 #include "definitions.h"
 #include "stocc.h"
-#include "randomc.h"
-#include "sampling/methodD.h"
 #include "sampling/methodH.h"
 #include "sampling/methodSH.h"
 
 template <typename Stocc = StochasticLib1, typename BaseSampler = HashSampling<>>
 class SeqDivideSampling {
-    public:
-        typedef BaseSampler base_type;
+public:
+    typedef BaseSampler base_type;
 
-        SeqDivideSampling(BaseSampler &base_sampler, ULONG base_size, ULONG seed) 
-            : stocc(seed),
-              base_sampler(std::move(base_sampler)),
-              base_size(base_size)
-        { }
+    SeqDivideSampling(BaseSampler &base_sampler, ULONG base_size, ULONG seed)
+        : stocc(seed),
+          base_sampler(std::move(base_sampler)),
+          base_size(base_size)
+    { }
 
-        template <typename F>
-        void sample(ULONG N, 
-                    ULONG n, 
-                    F &&callback,
-                    ULONG offset = 0) {
-            if (n <= base_size) {
-                base_sampler.sample(N, n, [&](ULONG sample) { callback(sample + offset); });
-                return;
-            } 
-            
-            ULONG N_split = N/2;
-            // std::cout << "draw " << n << " from " << N << " with " << N_split << std::endl;
-            ULONG x = stocc.Hypergeometric(N_split, n, N); 
-            sample(N_split, x, callback, offset);
-            sample(N-N_split, n-x, callback, offset + N_split);
+    template <typename F>
+    void sample(ULONG N,
+                ULONG n,
+                F &&callback,
+                ULONG offset = 0) {
+        if (n <= base_size) {
+            base_sampler.sample(N, n, [&](ULONG sample) { callback(sample + offset); });
+            return;
         }
 
-    private:
-        Stocc stocc;
-        BaseSampler base_sampler;
-        ULONG base_size;
+        ULONG N_split = N/2;
+        // std::cout << "draw " << n << " from " << N << " with " << N_split << std::endl;
+        ULONG x = stocc.Hypergeometric(N_split, n, N);
+        sample(N_split, x, callback, offset);
+        sample(N-N_split, n-x, callback, offset + N_split);
+    }
+
+private:
+    Stocc stocc;
+    BaseSampler base_sampler;
+    ULONG base_size;
 };
 
-#endif 
-
+#endif
