@@ -1,5 +1,5 @@
 /******************************************************************************
- * definitions.h 
+ * definitions.h
  *
  * Source of the graph generator
  ******************************************************************************
@@ -22,17 +22,16 @@
 #define _DEFINITIONS_H_
 
 // Constants
-typedef long long LONG;
-typedef unsigned long long ULONG;
+typedef int LONG;
+typedef unsigned int ULONG;
 typedef int INT;
 typedef unsigned int UINT;
 typedef unsigned long long NodeID;
 typedef unsigned long long EdgeID;
 typedef unsigned long long NodeWeight;
 typedef unsigned long long EdgeWeight;
-typedef int PEID; 
+typedef int PEID;
 
 const PEID ROOT = 0;
 
 #endif
-
