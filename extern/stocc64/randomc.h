@@ -108,15 +108,15 @@
   typedef unsigned long int64_t uint64_t;
 #elif defined(_MSC_VER)
   // Older Microsoft compilers have their own definition
-  typedef   signed __int32  int32_t;
-  typedef unsigned __int32 uint32_t;
+  typedef   signed __int32  int64_t;
+  typedef unsigned __int32 uint64_t;
   typedef   signed __int64  int64_t;
   typedef unsigned __int64 uint64_t;
   #define INT64_SUPPORTED // Remove this if the compiler doesn't support 64-bit integers
 #else
   // This works with most compilers
-  typedef signed int32_t      int32_t;
-  typedef unsigned int32_t   uint32_t;
+  typedef signed int64_t          int64_t;
+  typedef unsigned int64_t       uint64_t;
   typedef long long           int64_t;
   typedef unsigned long long uint64_t;
   #define INT64_SUPPORTED // Remove this if the compiler doesn't support 64-bit integers
@@ -171,7 +171,7 @@ public:
    void RandomInitByArray(int64_t const seeds[], int64_t NumSeeds); // Seed by more than 32 bits
    int64_t IRandom (int64_t min, int64_t max);     // Output random integer
    int64_t IRandomX(int64_t min, int64_t max);     // Output random integer, exact
-   double Random();                    // Output random double
+   double Random();                    // Output random float
    uint64_t BRandom();                 // Output random bits
 private:
    void Init0(int64_t seed);               // Basic initialization procedure

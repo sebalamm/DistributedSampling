@@ -39,7 +39,7 @@
 #define likely(x) __builtin_expect((x),1)
 #endif
 
-template <ULONG blocksize = (1 << 24), ULONG dummy = std::numeric_limits<ULONG>::max()>
+template <ULONG blocksize = (1 << 16), ULONG dummy = std::numeric_limits<ULONG>::max()>
 class HashSampling {
     public:
         HashSampling(ULONG seed, ULONG n) { 

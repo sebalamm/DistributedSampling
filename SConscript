@@ -53,7 +53,7 @@ if env['program'] == 'library':
         'extern/stocc64/stoc2.cpp',
         'extern/stocc64/stoc3.cpp',
         'extern/stocc64/userintf.cpp',
-        'extern/stocc64/wnchyppr.cpp',
+        # 'extern/stocc64/wnchyppr.cpp',
         'extern/stocc64/fnchyppr.cpp',
         'extern/mt19937-64/mt19937-64.c',
         'extern/spooky/spooky.cpp',

@@ -31,7 +31,7 @@
 #include "tools/spooky_hash.h"
 #include "sampling/methodR.h"
 
-template <typename Stocc = StochasticLib1, typename LocalSampler = SeqDivideSampling<>, typename H = Spooky>
+template <typename Stocc = StochasticLib2, typename LocalSampler = SeqDivideSampling<>, typename H = Spooky>
 class ParDivideSampling {
     public:
         ParDivideSampling(SamplingConfig &config, ULONG seed, PEID size) 

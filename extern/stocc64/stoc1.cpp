@@ -24,7 +24,6 @@
 *****************************************************************************/
 
 #include "stocc.h"     // class definition
-#include <iostream>
 
 
 /***********************************************************************
@@ -48,25 +47,25 @@ double LnFac(int64_t n) {
    // C5 =  1./1260.,                  // use r^5 term if FAK_LEN < 50
    // C7 = -1./1680.;                  // use r^7 term if FAK_LEN < 20
    // static variables
-   // static double fac_table[FAK_LEN];   // table of ln(n!):
-   // static int64_t initialized = 0;         // remember if fac_table has been initialized
+   static double fac_table[FAK_LEN];   // table of ln(n!):
+   static int64_t initialized = 0;         // remember if fac_table has been initialized
 
-   // if (n < FAK_LEN) {
-   //    if (n <= 1) {
-   //       if (n < 0) FatalError("Parameter negative in LnFac function");  
-   //       return 0;
-   //    }
-   //    if (!initialized) {              // first time. Must initialize table
-   //       // make table of ln(n!)
-   //       double sum = fac_table[0] = 0.;
-   //       for (int64_t i=1; i<FAK_LEN; i++) {
-   //          sum += log(double(i));
-   //          fac_table[i] = sum;
-   //       }
-   //       initialized = 1;
-   //    }
-   //    return fac_table[n];
-   // }
+   if (n < FAK_LEN) {
+      if (n <= 1) {
+         if (n < 0) FatalError("Parameter negative in LnFac function");  
+         return 0;
+      }
+      if (!initialized) {              // first time. Must initialize table
+         // make table of ln(n!)
+         double sum = fac_table[0] = 0.;
+         for (int64_t i=1; i<FAK_LEN; i++) {
+            sum += log(double(i));
+            fac_table[i] = sum;
+         }
+         initialized = 1;
+      }
+      return fac_table[n];
+   }
    // not found in table. use Stirling approximation
    double  n1, r;
    n1 = n;  r  = 1. / n1;

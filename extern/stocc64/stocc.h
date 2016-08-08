@@ -98,7 +98,7 @@
 * Sampling from multivariate Fisher's noncentral hypergeometric distribution.
 *
 *
-* Uniform random number generators (integer and double) are also available, as
+* Uniform random number generators (integer and float) are also available, as
 * these are inherited from the random number generator class that is the base
 * class of StochasticLib1.
 *
@@ -220,9 +220,11 @@
       #define STOC_BASE StocRBase
    #else
       // #define STOC_BASE CRandomMersenne     // C++ Mersenne Twister
-      // Or choose any other random number generator base class, for example:
       #include "mt_wrapper.h"
-      #define STOC_BASE MTWrapper // Binary library SFMT generator
+      #define STOC_BASE MTWrapper     // C++ Mersenne Twister
+      // Or choose any other random number generator base class, for example:
+      //#include "randoma.h"
+      //#define STOC_BASE CRandomSFMTA      // Binary library SFMT generator
    #endif
 #endif
 
@@ -234,7 +236,7 @@ double LnFac(int64_t n);               // log factorial (stoc1.cpp)
 double LnFacr(double x);               // log factorial of non-integer (wnchyppr.cpp)
 double FallingFactorial(double a, double b); // Falling factorial (wnchyppr.cpp)
 double Erf (double x);                 // error function (wnchyppr.cpp)
-int64_t FloorLog2(double x);            // floor(log2(x)) for x > 0 (wnchyppr.cpp)
+int64_t FloorLog2(float x);            // floor(log2(x)) for x > 0 (wnchyppr.cpp)
 int64_t NumSD (double accuracy);           // used internally for determining summation interval
 
 
@@ -294,7 +296,6 @@ public:
 
    // functions used internally
 protected:
-   // static double fc_lnpk(int64_t k, int64_t N_Mn, int64_t M, int64_t n); // used by Hypergeometric
    static double fc_lnpk(int64_t k, int64_t N_Mn, int64_t M, int64_t n); // used by Hypergeometric
 
    // subfunctions for each approximation method
