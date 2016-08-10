@@ -1,0 +1,5 @@
+add_subdirectory(mt19937-64)
+add_subdirectory(stocc64)
+add_subdirectory(dSFMT)
+add_subdirectory(spooky)
+add_subdirectory(city)

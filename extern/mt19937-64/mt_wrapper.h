@@ -23,8 +23,6 @@
 #ifndef _MT_WRAPPER_H_
 #define _MT_WRAPPER_H_
 
-#include "definitions.h"
-
 extern "C" {
     #include "mt64.h"
     void init_genrand64(unsigned long long seed);
@@ -42,19 +40,19 @@ class MTWrapper {
     public:
         MTWrapper() {};
 
-        MTWrapper(ULONG seed) {
+        MTWrapper(unsigned long long seed) {
             RandomInit(seed);
         };
 
-        void RandomInit(ULONG seed) {
+        void RandomInit(unsigned long long seed) {
             init_genrand64(seed);
         }
 
-        void RandomInitByArray(ULONG seeds[], ULONG NumSeeds) {
+        void RandomInitByArray(unsigned long long seeds[], unsigned long long NumSeeds) {
             init_by_array64(seeds, NumSeeds);
         }
 
-        ULONG BRandom() {
+        unsigned long long BRandom() {
             return genrand64_int64();
         }
 
@@ -62,9 +60,9 @@ class MTWrapper {
             return genrand64_real2();
         }
 
-        ULONG IRandom(ULONG min, ULONG max) {
+        unsigned long long IRandom(unsigned long long min, unsigned long long max) {
             if (max == min) return min;
-            ULONG r = ULONG((double)(ULONG)(max - min + 1) * Random() + min); 
+            unsigned long long r = (unsigned long long)((double)(unsigned long long)(max - min + 1) * Random() + min); 
             if (r > max) r = max;
             return r;
         }
