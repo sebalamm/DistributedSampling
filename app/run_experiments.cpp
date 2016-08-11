@@ -21,18 +21,27 @@
 
 #include "definitions.h"
 #include "stocc.h"
+#include "rhyper.h"
 #include <iostream>
 
 int main(int argn, char **argv) {
     StochasticLib1 stocc(0);
+    HyperGen gen(0);
 
-    for (ULONG i = 0; i < 100; ++i) {
-        stocc.RandomInit(i);
-        ULONG N = pow(2,60);
-        // ULONG N = pow(2,60);
-        ULONG m = N/2;
-        ULONG n = pow(2,40);
-        // ULONG n = pow(2,10);
-        std::cout << stocc.Hypergeometric(n, m, N) << std::endl;
-    }
+    FILE *fp = fopen("deviates", "w+");
+
+    fprintf(fp, "%lld\n", (ULONG) gen.generate(pow(2,16), pow(2,40) - pow(2,16), pow(2,39)));
+    fprintf(fp, "%lld\n", (ULONG) gen.generate(pow(2,16), pow(2,60) - pow(2,16), pow(2,59)));
+    // for (ULONG i = 16; i < 40; ++i) {
+    //     stocc.RandomInit(i);
+    //     gen.RandomInit(i);
+    //     ULONG N = pow(2,60);
+    //     ULONG m = pow(2,59);
+    //     ULONG n = pow(2,i);
+    //     std::cout << i << std::endl;
+    //     fprintf(fp, "%lld\n", (ULONG) gen.generate(n, N - n, m));
+    //     // fprintf(fp, "%lld\n", (ULONG) stocc.Hypergeometric(m, n, N));
+    // }
+
+    fclose(fp);
 }

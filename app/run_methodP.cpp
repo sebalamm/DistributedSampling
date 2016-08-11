@@ -19,17 +19,16 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#include <argtable2.h>
 #include <mpi.h>
 
 #include <vector>
 
 #include "timer.h"
 #include "macros_assertions.h"
-#include "parse_parameters.h"
 #include "sampling_config.h"
 #include "sampling/methodP.h"
 #include "tools/benchmark.h"
+#include "tools/arg_parser.h"
 
 int main(int argn, char **argv) {
     // Init MPI
@@ -40,9 +39,14 @@ int main(int argn, char **argv) {
 
     // Read command-line args
     SamplingConfig config;
-    int ret_code = parse_parameters(argn, argv, 
-                                    config); 
-    if (ret_code) { MPI_Finalize(); return 0; }
+
+    arg_parser args(argn, argv);
+    config.N = 1 << args.get<ULONG>("N", 30);
+    config.n = 1 << args.get<ULONG>("n", 20); // sample size
+    config.k = 1 << args.get<ULONG>("k", 10); // base case
+    config.seed = args.get<ULONG>("seed", 1);
+    config.iterations = args.get<ULONG>("i", 1);
+    config.output_file = args.get<std::string>("output", "tmp");
 
     // Main algorithm
     FILE *fp;
