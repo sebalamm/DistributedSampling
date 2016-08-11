@@ -25,28 +25,29 @@ def plot_scaling(data):
     print("##########################")
     print("Generate plot...")
 
-    cycles = 1200000000
+    bases = sorted(list(set([int(t[1]) for t in data if int(t[2]) == 1])))
+    pes = sorted(list(set([int(t[2]) for t in data])))
+    print(bases)
+    print(pes)
 
-    bases = sorted(list(set([int(t[2]) for t in data])))
-    samples = sorted(list(set([int(t[1]) for t in data])))
-    algs = sorted(list(set([t[0] for t in data])))
-    print(data)
-    for alg in algs:
-        d_means = [float(t[3])/int(t[1]) * cycles for t in data if t[0] == alg]
-        d_stdev = [float(t[4]) for t in data if t[0] == alg]
-        print(d_means)
-        print(samples)
-        plt.errorbar(samples, d_means, marker="^", label=alg)
+    for base in bases:
+        means = [float(t[3]) * 1e9 / (int(t[1])/int(t[2])) for t in data if int(t[1])/int(t[2]) == base]
+        stdev = [float(t[4]) * 1e9 / (int(t[1])/int(t[2])) for t in data if int(t[1])/int(t[2]) == base]
+        weak_scaling = means
+        # weak_scaling = [float(means[0])/float(t) for t in means]
+        # plt.errorbar(pes, weak_scaling, stdev, marker="^", label="$n/p$=" + str(base))
+        plt.errorbar(pes, weak_scaling, marker="^", label="$n/p$=" + str(base))
 
     plt.grid(True)
-    plt.title(r"Running time for $N=2^{" + str(52) + "}$ averaged over $" + str(10) + r"$ repetitions")
-    plt.xscale("log")
+    plt.title(r"Parallel efficiency for $N=2^{30}$ and $N/{np}$ repetitions")
     # plt.xlabel(r"$\log_{10}$(Sample size)")
-    plt.xlabel("Sample size")
-    # plt.ylabel("Time per sample(s)")
-    plt.ylabel("Cycles per sample")
+    plt.xscale("log", basex=2)
+    # plt.yscale("log")
+    plt.xlabel("Number of PEs $p$")
+    plt.ylabel(r"Running time (ns) / $(n/p)$")
     plt.legend(loc=0)
-    plt.gca().get_yaxis().get_major_formatter().set_useOffset(False)
+    plt.tight_layout()
+    # plt.gca().get_yaxis().get_major_formatter().set_useOffset(False)
     pp.savefig()
     plt.close()
 
@@ -58,24 +59,29 @@ def plot_scaling(data):
 parser = argparse.ArgumentParser(description='Evaluate different sampling methods.')
 parser.add_argument('-i', type=str, nargs='?')
 parser.add_argument('-f', type=str, nargs='?')
+parser.add_argument('-l', type=int, nargs='?')
 args = parser.parse_args()
 
 input_file = args.i
 output_file = args.f
+limit = args.l
+print(limit)
 
 # Init plots
 pp = PdfPages(output_file + '.pdf')
 
 # Title
 print("##########################")
-print(bcolors.HEADER + "Sampling (Direct Comparison)" + bcolors.ENDC)
+print(bcolors.HEADER + "Sampling (Weak Scaling)" + bcolors.ENDC)
 print("##########################")
 
 running_times = []
 
 with open(input_file) as infile:
     for line in infile:
-        running_times.append(line.strip().split())
+        args = re.split('=| ', line.strip())
+        print(args)
+        running_times.append((args[2], args[4], args[8], args[10], args[12]))
 
 # Create plot
 plot_scaling(running_times)
