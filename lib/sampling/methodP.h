@@ -27,7 +27,6 @@
 #include "definitions.h"
 #include "stocc.h"
 #include "randomc.h"
-#include "tools/crc_hash.h"
 #include "tools/spooky_hash.h"
 #include "sampling/methodR.h"
 

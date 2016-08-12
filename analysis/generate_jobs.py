@@ -17,20 +17,21 @@ class bcolors:
 #######################
 def sample(n, N, k, P, iterations, method):
     output = "job_" + str(n) + "_" + str(N) + "_" + str(P)
+    run_output = "run_" + str(n) + "_" + str(N) + "_" + str(P)
     out = open(output, 'w')
     out.write("# @ job_name = sample_" + str(n) + "_" + str(N) + "_" + str(P) + "\n") 
-    out.write("# @ commment = 'test sample weak-scaling'" + "\n")
-    out.write("# @ error = $(job_name).$(job_id).out" + "\n")
-    out.write("# @ output = $(job_name).$(job_id).out" + "\n")
+    out.write("# @ comment = 'test sample weak-scaling'" + "\n")
+    out.write("# @ error = $(job_name).$(jobid).out" + "\n")
+    out.write("# @ output = $(job_name).$(jobid).out" + "\n")
     out.write("# @ environment = COPY_ALL" + "\n")
-    out.write("# @ wall_clock_limit = 00:05:00" + "\n")
+    out.write("# @ wall_clock_limit = 00:10:00" + "\n")
     out.write("# @ notification = error" + "\n")
     out.write("# @ notify_user = seba.lamm@gmail.com" + "\n")
-    out.write("# @ job_type = blueqene" + "\n")
+    out.write("# @ job_type = bluegene" + "\n")
     out.write("# @ bg_size = 32" + "\n")
     out.write("# @ queue" + "\n")
     out.write("\n") 
-    out.write("runjob --np " + str(P) + " --ranks-per-node 1 : ~/code/build/run_method" + method + " -n " + str(n) + " -N " + str(N) + " -k " + str(k) + " -i " + str(iterations) + " -output " + output)
+    out.write("runjob --np " + str(P) + " --ranks-per-node 1 : ~/code/build/run_method" + method + " -n " + str(n) + " -N " + str(N) + " -k " + str(k) + " -i " + str(iterations) + " -output " + run_output)
     out.close()
 
 #######################
