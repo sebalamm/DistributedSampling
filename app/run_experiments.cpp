@@ -25,23 +25,26 @@
 #include <iostream>
 
 int main(int argn, char **argv) {
-    StochasticLib1 stocc(0);
-    HyperGen gen(0);
+    // StochasticLib1 stocc(0);
+    StochasticLib2 stocc(0);
+    // HyperGen gen(0);
 
     FILE *fp = fopen("deviates", "w+");
 
-    fprintf(fp, "%lld\n", (ULONG) gen.generate(pow(2,16), pow(2,40) - pow(2,16), pow(2,39)));
-    fprintf(fp, "%lld\n", (ULONG) gen.generate(pow(2,16), pow(2,60) - pow(2,16), pow(2,59)));
-    // for (ULONG i = 16; i < 40; ++i) {
-    //     stocc.RandomInit(i);
-    //     gen.RandomInit(i);
-    //     ULONG N = pow(2,60);
-    //     ULONG m = pow(2,59);
-    //     ULONG n = pow(2,i);
-    //     std::cout << i << std::endl;
-    //     fprintf(fp, "%lld\n", (ULONG) gen.generate(n, N - n, m));
-    //     // fprintf(fp, "%lld\n", (ULONG) stocc.Hypergeometric(m, n, N));
-    // }
+    ULONG N = pow(2,45);
+    ULONG m = pow(2,44);
+    ULONG n = pow(2,7);
+
+    // for (ULONG i = 0; i < N/n; ++i) {
+    for (ULONG i = 0; i < 10000000; ++i) {
+        if (i % 100000 == 0) std::cout << "alive " << i / 100000 << std::endl;
+
+        stocc.RandomInit(i);
+        fprintf(fp, "%lld\n", (ULONG) stocc.Hypergeometric(m, n, N));
+
+        // gen.RandomInit(i);
+        // fprintf(fp, "%lld\n", (ULONG) gen.generate(n, N - n, m));
+    }
 
     fclose(fp);
 }
