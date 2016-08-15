@@ -30,7 +30,7 @@
 #include "sampling/methodH.h"
 #include "sampling/methodSH.h"
 
-template <typename Stocc = StochasticLib1, typename BaseSampler = HashSampling<>>
+template <typename Stocc = StochasticLib2, typename BaseSampler = HashSampling<>>
 class SeqDivideSampling {
     public:
         typedef BaseSampler base_type;
