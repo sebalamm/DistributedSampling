@@ -15,4 +15,4 @@ add_library(stocc ${stocc_sources} ${stocc_headers})
 
 target_include_directories(stocc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(stocc mt)
+target_link_libraries(stocc)
