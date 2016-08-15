@@ -65,7 +65,7 @@ int main(int argn, char **argv) {
 
         // Compute sample
         SortedHashSampling<> hs(config.seed + iteration, config.k);
-        SeqDivideSampling<StochasticLib2, SortedHashSampling<>> sds(hs, config.k, config.seed + iteration);
+        SeqDivideSampling<StochasticLib1, SortedHashSampling<>> sds(hs, config.k, config.seed + iteration);
         sds.sample(config.N,
                    config.n,
                    [&](ULONG elem) {
@@ -85,7 +85,7 @@ int main(int argn, char **argv) {
 
         // Compute sample
         SortedHashSampling<> hs(config.seed + iteration, config.k);
-        SeqDivideSampling<StochasticLib2, SortedHashSampling<>> sds(hs, config.k, config.seed + iteration);
+        SeqDivideSampling<StochasticLib1, SortedHashSampling<>> sds(hs, config.k, config.seed + iteration);
         sds.sample(config.N,
                    config.n,
                    [&](ULONG elem) {

@@ -29,25 +29,25 @@
 /***********************************************************************
 constants
 ***********************************************************************/
-const double SHAT1 = 2.943035529371538573;    // 8/e
-const double SHAT2 = 0.8989161620588987408;   // 3-sqrt(12/e)
+const __float128 SHAT1 = 2.943035529371538573;    // 8/e
+const __float128 SHAT2 = 0.8989161620588987408;   // 3-sqrt(12/e)
 
 
 /***********************************************************************
 Log factorial function
 ***********************************************************************/
-double LnFac(int64_t n) {
+__float128 LnFac(int64_t n) {
    // log factorial function. gives natural logarithm of n!
 
    // define constants
-   static const double                 // coefficients in Stirling approximation     
+   static const __float128                 // coefficients in Stirling approximation     
       C0 =  0.918938533204672722,      // ln(sqrt(2*pi))
       C1 =  1./12., 
       C3 = -1./360.;
    // C5 =  1./1260.,                  // use r^5 term if FAK_LEN < 50
    // C7 = -1./1680.;                  // use r^7 term if FAK_LEN < 20
    // static variables
-   static double fac_table[FAK_LEN];   // table of ln(n!):
+   static __float128 fac_table[FAK_LEN];   // table of ln(n!):
    static int64_t initialized = 0;         // remember if fac_table has been initialized
 
    if (n < FAK_LEN) {
@@ -57,9 +57,9 @@ double LnFac(int64_t n) {
       }
       if (!initialized) {              // first time. Must initialize table
          // make table of ln(n!)
-         double sum = fac_table[0] = 0.;
+         __float128 sum = fac_table[0] = 0.;
          for (int64_t i=1; i<FAK_LEN; i++) {
-            sum += log(double(i));
+            sum += log(__float128(i));
             fac_table[i] = sum;
          }
          initialized = 1;
@@ -67,7 +67,7 @@ double LnFac(int64_t n) {
       return fac_table[n];
    }
    // not found in table. use Stirling approximation
-   double  n1, r;
+   __float128  n1, r;
    n1 = n;  r  = 1. / n1;
    return (n1 + 0.5)*log(n1) - n1 + C0 + r*(C1 + r*r*C3);
 }
@@ -162,17 +162,17 @@ int64_t StochasticLib1::HypInversionMod (int64_t n, int64_t m, int64_t N) {
    // Sampling 
    int64_t       I;                    // Loop counter
    int64_t       L = N - m - n;        // Parameter
-   double        modef;                // mode, float
-   double        Mp, np;               // m + 1, n + 1
-   double        p;                    // temporary
-   double        U;                    // uniform random
-   double        c, d;                 // factors in iteration
-   double        divisor;              // divisor, eliminated by scaling
-   double        k1, k2;               // float version of loop counter
-   double        L1 = L;               // float version of L
+   __float128        modef;                // mode, float
+   __float128        Mp, np;               // m + 1, n + 1
+   __float128        p;                    // temporary
+   __float128        U;                    // uniform random
+   __float128        c, d;                 // factors in iteration
+   __float128        divisor;              // divisor, eliminated by scaling
+   __float128        k1, k2;               // float version of loop counter
+   __float128        L1 = L;               // float version of L
 
-   Mp = (double)(m + 1);
-   np = (double)(n + 1);
+   Mp = (__float128)(m + 1);
+   np = (__float128)(n + 1);
 
    if (N != hyp_N_last || m != hyp_m_last || n != hyp_n_last) {
       // set-up when parameters have changed
@@ -195,7 +195,7 @@ int64_t StochasticLib1::HypInversionMod (int64_t n, int64_t m, int64_t N) {
 
       // safety bound - guarantees at least 17 significant decimal digits
       // bound = min(n, (int64_t)(modef + k*c'))
-      hyp_bound = (int64_t)(modef + 11. * sqrt(modef * (1.-p) * (1.-n/(double)N)+1.));
+      hyp_bound = (int64_t)(modef + 11. * sqrt(modef * (1.-p) * (1.-n/(__float128)N)+1.));
       if (hyp_bound > n) hyp_bound = n;
    }
 
@@ -260,20 +260,20 @@ int64_t StochasticLib1::HypRatioOfUnifoms (int64_t n, int64_t m, int64_t N) {
    int64_t L;                          // N-m-n
    int64_t mode;                       // mode
    int64_t k;                          // integer sample
-   double x;                           // real sample
-   double rNN;                         // 1/(N*(N+2))
-   double my;                          // mean
-   double var;                         // variance
-   double u;                           // uniform random
-   double lf;                          // ln(f(x))
+   __float128 x;                           // real sample
+   __float128 rNN;                         // 1/(N*(N+2))
+   __float128 my;                          // mean
+   __float128 var;                         // variance
+   __float128 u;                           // uniform random
+   __float128 lf;                          // ln(f(x))
 
    L = N - m - n;
    if (hyp_N_last != N || hyp_m_last != m || hyp_n_last != n) {
       hyp_N_last = N;  hyp_m_last = m;  hyp_n_last = n;         // Set-up
-      rNN = 1. / ((double)N*(N+2));                             // make two divisions in one
-      my = (double)n * m * rNN * (N+2);                         // mean = n*m/N
-      mode = (int64_t)(double(n+1) * double(m+1) * rNN * N);    // mode = floor((n+1)*(m+1)/(N+2))
-      var = (double)n * m * (N-m) * (N-n) / ((double)N*N*(N-1));// variance
+      rNN = 1. / ((__float128)N*(N+2));                             // make two divisions in one
+      my = (__float128)n * m * rNN * (N+2);                         // mean = n*m/N
+      mode = (int64_t)(__float128(n+1) * __float128(m+1) * rNN * N);    // mode = floor((n+1)*(m+1)/(N+2))
+      var = (__float128)n * m * (N-m) * (N-n) / ((__float128)N*N*(N-1));// variance
       hyp_h = sqrt(SHAT1 * (var+0.5)) + SHAT2;                  // hat width
       hyp_a = my + 0.5;                                         // hat center
       hyp_fm = fc_lnpk(mode, L, m, n);                          // maximum
@@ -296,7 +296,7 @@ int64_t StochasticLib1::HypRatioOfUnifoms (int64_t n, int64_t m, int64_t N) {
 }
 
 
-double StochasticLib1::fc_lnpk(int64_t k, int64_t L, int64_t m, int64_t n) {
+__float128 StochasticLib1::fc_lnpk(int64_t k, int64_t L, int64_t m, int64_t n) {
    // subfunction used by hypergeometric and Fisher's noncentral hypergeometric distribution
    return(LnFac(k) + LnFac(m - k) + LnFac(n - k) + LnFac(L + k));
 }
@@ -354,7 +354,7 @@ void StochasticLib1::MultiHypergeometric (int64_t * destination, int64_t * sourc
 /***********************************************************************
 Poisson distribution
 ***********************************************************************/
-int64_t StochasticLib1::Poisson (double L) {
+int64_t StochasticLib1::Poisson (__float128 L) {
    /*
    This function generates a random variate with the poisson distribution.
 
@@ -408,7 +408,7 @@ int64_t StochasticLib1::Poisson (double L) {
 /***********************************************************************
 Subfunctions used by poisson
 ***********************************************************************/
-int64_t StochasticLib1::PoissonLow(double L) {
+int64_t StochasticLib1::PoissonLow(__float128 L) {
    /*
    This subfunction generates a random variate with the poisson 
    distribution for extremely low values of L.
@@ -419,7 +419,7 @@ int64_t StochasticLib1::PoissonLow(double L) {
    The reason for using this method is to avoid the numerical inaccuracies 
    in other methods.
    */   
-   double d, r;
+   __float128 d, r;
    d = sqrt(L);
    if (Random() >= d) return 0;
    r = Random() * d;
@@ -429,7 +429,7 @@ int64_t StochasticLib1::PoissonLow(double L) {
 }
 
 
-int64_t StochasticLib1::PoissonInver(double L) {
+int64_t StochasticLib1::PoissonInver(__float128 L) {
    /*
    This subfunction generates a random variate with the poisson 
    distribution using inversion by the chop down method (PIN).
@@ -439,8 +439,8 @@ int64_t StochasticLib1::PoissonInver(double L) {
    The value of bound must be adjusted to the maximal value of L.
    */   
    const int64_t bound = 130;              // safety bound. Must be > L + 8*sqrt(L).
-   double r;                           // uniform random number
-   double f;                           // function value
+   __float128 r;                           // uniform random number
+   __float128 f;                           // function value
    int64_t x;                          // return value
 
    if (L != pois_L_last) {             // set up
@@ -461,7 +461,7 @@ int64_t StochasticLib1::PoissonInver(double L) {
 }  
 
 
-int64_t StochasticLib1::PoissonRatioUniforms(double L) {
+int64_t StochasticLib1::PoissonRatioUniforms(__float128 L) {
    /*
    This subfunction generates a random variate with the poisson 
    distribution using the ratio-of-uniforms rejection method (PRUAt).
@@ -473,9 +473,9 @@ int64_t StochasticLib1::PoissonRatioUniforms(double L) {
    discrete random variates". Journal of Computational and Applied Mathematics,
    vol. 31, no. 1, 1990, pp. 181-189.
    */
-   double u;                                          // uniform random
-   double lf;                                         // ln(f(x))
-   double x;                                          // real sample
+   __float128 u;                                          // uniform random
+   __float128 lf;                                         // ln(f(x))
+   __float128 x;                                          // real sample
    int64_t k;                                         // integer sample
 
    if (pois_L_last != L) {
@@ -505,7 +505,7 @@ int64_t StochasticLib1::PoissonRatioUniforms(double L) {
 /***********************************************************************
 Binomial distribution
 ***********************************************************************/
-int64_t StochasticLib1::Binomial (int64_t n, double p) {
+int64_t StochasticLib1::Binomial (int64_t n, __float128 p) {
    /*
    This function generates a random variate with the binomial distribution.
 
@@ -516,7 +516,7 @@ int64_t StochasticLib1::Binomial (int64_t n, double p) {
    */
    int64_t inv = 0;                        // invert
    int64_t x;                          // result
-   double np = n * p;
+   __float128 np = n * p;
 
    if (p > 0.5) {                      // faster calculation by inversion
       p = 1. - p;  inv = 1;
@@ -557,7 +557,7 @@ int64_t StochasticLib1::Binomial (int64_t n, double p) {
 Subfunctions used by binomial
 ***********************************************************************/
 
-int64_t StochasticLib1::BinomialInver (int64_t n, double p) {
+int64_t StochasticLib1::BinomialInver (int64_t n, __float128 p) {
    /* 
    Subfunction for Binomial distribution. Assumes p < 0.5.
 
@@ -567,9 +567,9 @@ int64_t StochasticLib1::BinomialInver (int64_t n, double p) {
 
    This method is fast when n*p is low. 
    */   
-   double f0, f, q; 
+   __float128 f0, f, q; 
    int64_t bound;
-   double pn, r, rc; 
+   __float128 pn, r, rc; 
    int64_t x, n1, i;
 
    // f(0) = probability of x=0 is (1-p)^n
@@ -602,7 +602,7 @@ int64_t StochasticLib1::BinomialInver (int64_t n, double p) {
 }
 
 
-int64_t StochasticLib1::BinomialRatioOfUniforms (int64_t n, double p) {
+int64_t StochasticLib1::BinomialRatioOfUniforms (int64_t n, __float128 p) {
    /* 
    Subfunction for Binomial distribution. Assumes p < 0.5.
 
@@ -616,12 +616,12 @@ int64_t StochasticLib1::BinomialRatioOfUniforms (int64_t n, double p) {
    discrete random variates". Journal of Computational and Applied Mathematics,
    vol. 31, no. 1, 1990, pp. 181-189.
    */   
-   double u;                           // uniform random
-   double q1;                          // 1-p
-   double np;                          // n*p
-   double var;                         // variance
-   double lf;                          // ln(f(x))
-   double x;                           // real sample
+   __float128 u;                           // uniform random
+   __float128 q1;                          // 1-p
+   __float128 np;                          // n*p
+   __float128 var;                         // variance
+   __float128 lf;                          // ln(f(x))
+   __float128 x;                           // real sample
    int64_t k;                          // integer sample
 
    if(bino_n_last != n || bino_p_last != p) {    // Set_up
@@ -657,7 +657,7 @@ int64_t StochasticLib1::BinomialRatioOfUniforms (int64_t n, double p) {
 /***********************************************************************
 Multinomial distribution
 ***********************************************************************/
-void StochasticLib1::Multinomial (int64_t * destination, double * source, int64_t n, int64_t colors) {
+void StochasticLib1::Multinomial (int64_t * destination, __float128 * source, int64_t n, int64_t colors) {
    /*
    This function generates a vector of random variates, each with the
    binomial distribution.
@@ -675,7 +675,7 @@ void StochasticLib1::Multinomial (int64_t * destination, double * source, int64_
    n:              The number of balls drawn from the urn.                   
    colors:         The number of possible colors. 
    */
-   double s, sum;
+   __float128 s, sum;
    int64_t x;
    int64_t i;
    if (n < 0 || colors < 0) FatalError("Parameter negative in multinomial function");
@@ -730,7 +730,7 @@ void StochasticLib1::Multinomial (int64_t * destination, int64_t * source, int64
          destination[i] = 0; continue;
       }
       p = source[i];
-      x = Binomial(n, (double)p/sum);
+      x = Binomial(n, (__float128)p/sum);
       n -= x; sum -= p;
       destination[i] = x;
    }
@@ -743,10 +743,10 @@ void StochasticLib1::Multinomial (int64_t * destination, int64_t * source, int64
 Normal distribution
 ***********************************************************************/
 
-double StochasticLib1::Normal(double m, double s) {
+__float128 StochasticLib1::Normal(__float128 m, __float128 s) {
    // normal distribution with mean m and standard deviation s
-   double normal_x1;                   // first random coordinate (normal_x2 is member of class)
-   double w;                           // radius
+   __float128 normal_x1;                   // first random coordinate (normal_x2 is member of class)
+   __float128 w;                           // radius
    if (normal_x2_valid) {              // we have a valid result from last call
       normal_x2_valid = 0;
       return normal_x2 * s + m;
@@ -764,12 +764,12 @@ double StochasticLib1::Normal(double m, double s) {
    return normal_x1 * s + m;
 }
 
-double StochasticLib1::NormalTrunc(double m, double s, double limit) {
+__float128 StochasticLib1::NormalTrunc(__float128 m, __float128 s, __float128 limit) {
    // Truncated normal distribution
    // The tails are cut off so that the output
    // is in the interval from (m-limit) to (m+limit)
    if (limit < s) FatalError("limit out of range in NormalTrunc function");
-   double x;
+   __float128 x;
    do {
       x = Normal(0., s);
    } while (fabs(x) > limit); // reject if beyond limit
@@ -780,7 +780,7 @@ double StochasticLib1::NormalTrunc(double m, double s, double limit) {
 /***********************************************************************
 Bernoulli distribution
 ***********************************************************************/
-int64_t StochasticLib1::Bernoulli(double p) {
+int64_t StochasticLib1::Bernoulli(__float128 p) {
    // Bernoulli distribution with parameter p. This function returns 
    // 0 or 1 with probability (1-p) and p, respectively.
    if (p < 0 || p > 1) FatalError("Parameter out of range in Bernoulli function");

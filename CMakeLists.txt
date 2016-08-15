@@ -19,7 +19,7 @@ add_executable(run_methodH "app/run_methodH.cpp")
 add_executable(run_methodR "app/run_methodR.cpp")
 add_executable(run_methodSH "app/run_methodSH.cpp")
 add_executable(run_methodSR "app/run_methodSR.cpp")
-# add_executable(run_experiments "app/run_experiments.cpp")
+add_executable(run_experiments "app/run_experiments.cpp")
 
 set(LIBS 
     stocc
@@ -33,4 +33,4 @@ target_link_libraries(run_methodH LINK_PUBLIC ${LIBS})
 target_link_libraries(run_methodR LINK_PUBLIC ${LIBS})
 target_link_libraries(run_methodSH LINK_PUBLIC ${LIBS})
 target_link_libraries(run_methodSR LINK_PUBLIC ${LIBS})
-# target_link_libraries(run_experiments LINK_PUBLIC ${LIBS})
+target_link_libraries(run_experiments LINK_PUBLIC ${LIBS})

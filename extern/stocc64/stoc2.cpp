@@ -29,7 +29,7 @@
 /***********************************************************************
                       Poisson distribution
 ***********************************************************************/
-int64_t StochasticLib2::Poisson (double L) {
+int64_t StochasticLib2::Poisson (__float128 L) {
 /*
    This function generates a random variate with the poisson distribution.
 
@@ -80,7 +80,7 @@ int64_t StochasticLib2::Poisson (double L) {
 /***********************************************************************
                       Binomial distributuion
 ***********************************************************************/
-int64_t StochasticLib2::Binomial (int64_t n, double p) {
+int64_t StochasticLib2::Binomial (int64_t n, __float128 p) {
 /*
    This function generates a random variate with the binomial distribution.
 
@@ -91,7 +91,7 @@ int64_t StochasticLib2::Binomial (int64_t n, double p) {
 */
   int64_t inv = 0;                         // invert
   int64_t x;                           // result
-  double np = n * p;
+  __float128 np = n * p;
 
   if (p > 0.5) {                       // faster calculation by inversion
     p = 1. - p;  inv = 1;}
@@ -171,7 +171,7 @@ int64_t StochasticLib2::Hypergeometric (int64_t n, int64_t m, int64_t N) {
   //------------------------------------------------------------------
   //                 choose method
   //------------------------------------------------------------------
-  if (double(n) * m >= 20. * N) {
+  if (__float128(n) * m >= 20. * N) {
     // use ratio-of-uniforms method
     x = HypPatchwork (n, m, N);
   }
@@ -188,7 +188,7 @@ int64_t StochasticLib2::Hypergeometric (int64_t n, int64_t m, int64_t N) {
                   Subfunctions used by binomial
 ***********************************************************************/
 
-int64_t StochasticLib2::BinomialModeSearch(int64_t n, double p) {
+int64_t StochasticLib2::BinomialModeSearch(int64_t n, __float128 p) {
 /* 
   Subfunction for Binomial distribution. Assumes p < 0.5.
 
@@ -199,7 +199,7 @@ int64_t StochasticLib2::BinomialModeSearch(int64_t n, double p) {
   This method is fast when n*p is low. 
 */   
   int64_t K, x;
-  double  U, c, d, rc, divisor;
+  __float128  U, c, d, rc, divisor;
 
   if (n != bino_n_last || p != bino_p_last) {
     bino_n_last = n;
@@ -245,20 +245,20 @@ int64_t StochasticLib2::BinomialModeSearch(int64_t n, double p) {
 }
 
 
-int64_t StochasticLib2::BinomialPatchwork(int64_t n, double p) {
+int64_t StochasticLib2::BinomialPatchwork(int64_t n, __float128 p) {
 /*
   Subfunction for Binomial distribution using the patchwork rejection
   method (BPRS).
 */  
 
   int64_t         mode, Dk, X, Y;
-  double        nu, q, U, V, W;
+  __float128        nu, q, U, V, W;
 
   if (n != bino_n_last || p != bino_p_last) {    // set-up
     bino_n_last = n;
     bino_p_last = p;
 
-    nu = (double)(n + 1) * p;  q = 1.0 - p;      // main parameters
+    nu = (__float128)(n + 1) * p;  q = 1.0 - p;      // main parameters
 
     // approximate deviation of reflection points k2, k4 from nu - 1/2
     W  = sqrt(nu * q + 0.25);
@@ -272,15 +272,15 @@ int64_t StochasticLib2::BinomialPatchwork(int64_t n, double p) {
     Bino_k5 = Bino_k4 + Bino_k4 - mode;
 
     // range width of the critical left and right centre region
-    Bino_dl = (double) (Bino_k2 - Bino_k1);
-    Bino_dr = (double) (Bino_k5 - Bino_k4);
+    Bino_dl = (__float128) (Bino_k2 - Bino_k1);
+    Bino_dr = (__float128) (Bino_k5 - Bino_k4);
 
     // recurrence constants r(k) = p(k)/p(k-1) at k = k1, k2, k4+1, k5+1
     nu = nu / q;  p = p / q;
-    Bino_r1 = nu / (double) Bino_k1      - p;    // nu = (n+1)p / q
-    Bino_r2 = nu / (double) Bino_k2      - p;    //  p =      p / q
-    Bino_r4 = nu / (double)(Bino_k4 + 1) - p;
-    Bino_r5 = nu / (double)(Bino_k5 + 1) - p;
+    Bino_r1 = nu / (__float128) Bino_k1      - p;    // nu = (n+1)p / q
+    Bino_r2 = nu / (__float128) Bino_k2      - p;    //  p =      p / q
+    Bino_r4 = nu / (__float128)(Bino_k4 + 1) - p;
+    Bino_r5 = nu / (__float128)(Bino_k5 + 1) - p;
 
     // reciprocal values of the scale parameters of expon. tail envelopes
     Bino_ll =  log(Bino_r1);                     // expon. tail left
@@ -378,7 +378,7 @@ int64_t StochasticLib2::BinomialPatchwork(int64_t n, double p) {
 }
 
   
-double StochasticLib2::BinomialF(int64_t k, int64_t n, double l_pq, double c_pm) {
+__float128 StochasticLib2::BinomialF(int64_t k, int64_t n, __float128 l_pq, __float128 c_pm) {
   // used by BinomialPatchwork
   return exp(k*l_pq - LnFac(k) - LnFac(n - k) - c_pm);
 }
@@ -388,7 +388,7 @@ double StochasticLib2::BinomialF(int64_t k, int64_t n, double l_pq, double c_pm)
                   Subfunctions used by poisson
 ***********************************************************************/
 
-int64_t StochasticLib2::PoissonModeSearch(double L) {
+int64_t StochasticLib2::PoissonModeSearch(__float128 L) {
 /*
    This subfunction generates a random variate with the poisson 
    distribution by down/up search from the mode, using the chop-down 
@@ -396,7 +396,7 @@ int64_t StochasticLib2::PoissonModeSearch(double L) {
 
    Execution time grows with sqrt(L). Gives overflow for L > 60.
 */
-  double   r, c, d; 
+  __float128   r, c, d; 
   int64_t  x, i, mode;
 
   mode = (int64_t)L;
@@ -435,7 +435,7 @@ int64_t StochasticLib2::PoissonModeSearch(double L) {
 }
   
 
-int64_t StochasticLib2::PoissonPatchwork(double L) {
+int64_t StochasticLib2::PoissonPatchwork(__float128 L) {
 /*
    This subfunction generates a random variate with the poisson 
    distribution using the Patchwork Rejection method (PPRS):
@@ -459,7 +459,7 @@ int64_t StochasticLib2::PoissonPatchwork(double L) {
 */
 
   int64_t mode, Dk, X, Y;
-  double  Ds, U, V, W;
+  __float128  Ds, U, V, W;
       
   if (L != pois_L_last) { // set-up
     pois_L_last = L;
@@ -476,14 +476,14 @@ int64_t StochasticLib2::PoissonPatchwork(double L) {
     Pois_k5 = Pois_k4 + Pois_k4 - mode;
 
     // range width of the critical left and right centre region
-    Pois_dl = (double) (Pois_k2 - Pois_k1);
-    Pois_dr = (double) (Pois_k5 - Pois_k4);
+    Pois_dl = (__float128) (Pois_k2 - Pois_k1);
+    Pois_dr = (__float128) (Pois_k5 - Pois_k4);
 
     // recurrence constants r(k) = p(k)/p(k-1) at k = k1, k2, k4+1, k5+1
-    Pois_r1 = L / (double) Pois_k1;
-    Pois_r2 = L / (double) Pois_k2;
-    Pois_r4 = L / (double)(Pois_k4 + 1);
-    Pois_r5 = L / (double)(Pois_k5 + 1);
+    Pois_r1 = L / (__float128) Pois_k1;
+    Pois_r2 = L / (__float128) Pois_k2;
+    Pois_r4 = L / (__float128)(Pois_k4 + 1);
+    Pois_r5 = L / (__float128)(Pois_k5 + 1);
 
     // reciprocal values of the scale parameters of expon. tail envelopes
     Pois_ll =  log(Pois_r1);                                     // expon. tail left
@@ -580,7 +580,7 @@ int64_t StochasticLib2::PoissonPatchwork(double L) {
 }
     
     
-double StochasticLib2::PoissonF(int64_t k, double l_nu, double c_pm) {
+__float128 StochasticLib2::PoissonF(int64_t k, __float128 l_nu, __float128 c_pm) {
   // used by PoissonPatchwork
   return  exp(k * l_nu - LnFac(k) - c_pm);
 }
@@ -616,14 +616,14 @@ int64_t StochasticLib2::HypPatchwork (int64_t n, int64_t m, int64_t N) {
 */
 
   int64_t  mode, Dk, X, V;
-  double   Mp, np, p, modef, U, Y, W;                 // (X, Y) <-> (V, W)
+  __float128   Mp, np, p, modef, U, Y, W;                 // (X, Y) <-> (V, W)
   
   if (N != hyp_N_last || m != hyp_m_last || n != hyp_n_last) { 
     // set-up when parameters have changed
     hyp_N_last = N; hyp_m_last = m; hyp_n_last = n;
 
-    Mp = (double)(m + 1);
-    np = (double)(n + 1);  
+    Mp = (__float128)(m + 1);
+    np = (__float128)(n + 1);  
     Hyp_L = N - m - n;
 
     p  = Mp / (N + 2.);  
@@ -644,14 +644,14 @@ int64_t StochasticLib2::HypPatchwork (int64_t n, int64_t m, int64_t N) {
     Hyp_k5 = Hyp_k4 + Hyp_k4 - mode;                             // delta_mr = 1
 
     // range width of the critical left and right centre region
-    Hyp_dl = (double) (Hyp_k2 - Hyp_k1);
-    Hyp_dr = (double) (Hyp_k5 - Hyp_k4);
+    Hyp_dl = (__float128) (Hyp_k2 - Hyp_k1);
+    Hyp_dr = (__float128) (Hyp_k5 - Hyp_k4);
 
     // recurrence constants r(k) = p(k)/p(k-1) at k = k1, k2, k4+1, k5+1
-    Hyp_r1 = (np/(double) Hyp_k1    - 1.) * (Mp - Hyp_k1)/(double)(Hyp_L + Hyp_k1);
-    Hyp_r2 = (np/(double) Hyp_k2    - 1.) * (Mp - Hyp_k2)/(double)(Hyp_L + Hyp_k2);
-    Hyp_r4 = (np/(double)(Hyp_k4+1) - 1.) * (m  - Hyp_k4)/(double)(Hyp_L + Hyp_k4 + 1);
-    Hyp_r5 = (np/(double)(Hyp_k5+1) - 1.) * (m  - Hyp_k5)/(double)(Hyp_L + Hyp_k5 + 1);
+    Hyp_r1 = (np/(__float128) Hyp_k1    - 1.) * (Mp - Hyp_k1)/(__float128)(Hyp_L + Hyp_k1);
+    Hyp_r2 = (np/(__float128) Hyp_k2    - 1.) * (Mp - Hyp_k2)/(__float128)(Hyp_L + Hyp_k2);
+    Hyp_r4 = (np/(__float128)(Hyp_k4+1) - 1.) * (m  - Hyp_k4)/(__float128)(Hyp_L + Hyp_k4 + 1);
+    Hyp_r5 = (np/(__float128)(Hyp_k5+1) - 1.) * (m  - Hyp_k5)/(__float128)(Hyp_L + Hyp_k5 + 1);
 
     // reciprocal values of the scale parameters of expon. tail envelopes
     Hyp_ll =  log(Hyp_r1);                                     // expon. tail left

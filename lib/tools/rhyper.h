@@ -28,7 +28,7 @@
 #include <random>
 
 #include "definitions.h"
-#include "mt_wrapper.h"
+#include "mersenne.h"
 
 #ifdef HAVE_NEARYINT
 #define R_forceint(x)   nearbyint()
@@ -54,22 +54,46 @@ class HyperGen {
             return mt.Random();
         }
 
-        __float128 afc(__int128 i) {
+        __float128 afc(ULONG i) {
+        // If (i > 7), use Stirling's approximation, otherwise use table lookup.
+            const static __float128 al[8] =
+            {
+                0.0,/*ln(0!)=ln(1)*/
+                0.0,/*ln(1!)=ln(1)*/
+                0.69314718055994530941723212145817,/*ln(2) */
+                1.79175946922805500081247735838070,/*ln(6) */
+                3.17805383034794561964694160129705,/*ln(24)*/
+                4.78749174278204599424770093452324,
+                6.57925121201010099506017829290394,
+                8.52516136106541430016553103634712
+                /* 10.60460290274525022841722740072165, approx. value below =
+                   10.6046028788027; rel.error = 2.26 10^{-9}
+                  FIXME: Use constants and if(n > ..) decisions from ./stirlerr.c
+                  -----  will be even *faster* for n > 500 (or so)
+                */
+            };
+
+            if (i < 0) {
+                printf(("rhyper.c: afc(i), i=%d < 0 -- SHOULD NOT HAPPEN!\n"), i);
+                return -1; // unreached
+            }
+            if (i <= 7)
+                return al[i];
             __float128 di = i;
             return (di + 0.5) * log(di) - di + M_LN_SQRT_2PI + (1./12. - 1./360. / (di * di)) / di;
         }
 
         __float128 generate(__float128 nn1in, __float128 nn2in, __float128 kkin) {
-             /* extern __float128 afc(__int128); */
+             /* extern __float128 afc(ULONG); */
 
-            __int128 nn1, nn2, kk;
-            __int128 ix; // return value (coerced to __float128 at the very end)
+            ULONG nn1, nn2, kk;
+            ULONG ix; // return value (coerced to __float128 at the very end)
             bool setup1, setup2;
 
             /* These should become 'thread_local globals' : */
-            static __int128 ks = -1, n1s = -1, n2s = -1;
-            static __int128 m, minjx, maxjx;
-            static __int128 k, n1, n2; // <- not allowing larger integer par
+            static ULONG ks = -1, n1s = -1, n2s = -1;
+            static ULONG m, minjx, maxjx;
+            static ULONG k, n1, n2; // <- not allowing larger integer par
             static __float128 tn;
 
             // II :
@@ -81,9 +105,9 @@ class HyperGen {
             nn2in = R_forceint(nn2in);
             kkin  = R_forceint(kkin);
 
-            nn1 = (__int128)nn1in;
-            nn2 = (__int128)nn2in;
-            kk  = (__int128)kkin;
+            nn1 = (ULONG)nn1in;
+            nn2 = (ULONG)nn2in;
+            kk  = (ULONG)kkin;
 
             /* if new parameter values, initialize */
             if (nn1 != n1s || nn2 != n2s) {
@@ -108,14 +132,14 @@ class HyperGen {
             if (setup2) {
                 ks = kk;
                 if (kk + kk >= tn) {
-                    k = (__int128)(tn - kk);
+                    k = (ULONG)(tn - kk);
                 } else {
                     k = kk;
                 }
             }
             if (setup1 || setup2) {
-                m = (__int128) ((k + 1.) * (n1 + 1.) / (tn + 2.));
-                minjx = std::max((__int128)0, k - n2);
+                m = (ULONG) ((k + 1.) * (n1 + 1.) / (tn + 2.));
+                minjx = std::max((ULONG)0, k - n2);
                 maxjx = std::min(n1, k);
 #ifdef DEBUG
                 printf("rhyper(nn1=%lld, nn2=%lld, kk=%lld), setup: floor(mean)= m=%lld, jx in (%lld..%lld)\n",
@@ -173,20 +197,20 @@ class HyperGen {
 
             if (setup1 || setup2) {
                 s = sqrt((tn - k) * k * n1 * n2 / (tn - 1) / tn / tn);
-                /* remark: d is defined in reference without __int128. */
+                /* remark: d is defined in reference without ULONG. */
                 /* the truncation centers the cell boundaries at 0.5 */
 
-                d = (__int128) (1.5 * s) + .5;
+                d = (ULONG) (1.5 * s) + .5;
                 xl = m - d + .5;
                 xr = m + d + .5;
                 a = afc(m) + afc(n1 - m) + afc(k - m) + afc(n2 - k + m);
-                kl = exp(a - afc((__int128) (xl)) - afc((__int128) (n1 - xl))
-                     - afc((__int128) (k - xl))
-                     - afc((__int128) (n2 - k + xl)));
-                kr = exp(a - afc((__int128) (xr - 1))
-                     - afc((__int128) (n1 - xr + 1))
-                     - afc((__int128) (k - xr + 1))
-                     - afc((__int128) (n2 - k + xr - 1)));
+                kl = exp(a - afc((ULONG) (xl)) - afc((ULONG) (n1 - xl))
+                     - afc((ULONG) (k - xl))
+                     - afc((ULONG) (n2 - k + xl)));
+                kr = exp(a - afc((ULONG) (xr - 1))
+                     - afc((ULONG) (n1 - xr + 1))
+                     - afc((ULONG) (k - xr + 1))
+                     - afc((ULONG) (n2 - k + xr - 1)));
                 lamdl = -log(xl * (n2 - k + xl) / (n1 - xl + 1) / (k - xl + 1));
                 lamdr = -log((n1 - xr + 1) * (k - xr + 1) / xr / (n2 - k + xr));
                 p1 = d + d;
@@ -198,7 +222,7 @@ class HyperGen {
                  xl, xr, lamdl,lamdr);
             printf("-------- p123= c(%g,%g,%g)\n", p1,p2, p3);
 #endif
-            __int128 n_uv = 0;
+            ULONG n_uv = 0;
               L30:
             u = unif_rand() * p3;
             v = unif_rand();
@@ -213,14 +237,14 @@ class HyperGen {
 #endif
 
             if (u < p1) {		/* rectangular region */
-                ix = (__int128) (xl + u);
+                ix = (ULONG) (xl + u);
             } else if (u <= p2) {	/* left tail */
-                ix = (__int128) (xl + log(v) / lamdl);
+                ix = (ULONG) (xl + log(v) / lamdl);
                 if (ix < minjx)
                     goto L30;
                 v = v * (u - p1) * lamdl;
             } else {		/* right tail */
-                ix = (__int128) (xr - log(v) / lamdr);
+                ix = (ULONG) (xr - log(v) / lamdr);
                 if (ix > maxjx)
                     goto L30;
                 v = v * (u - p2) * lamdr;
@@ -236,7 +260,7 @@ class HyperGen {
                    in the (m > ix) case, but the definition of the
                    recurrence relation on p134 shows that the +1 is
                    needed. */
-                __int128 i;
+                ULONG i;
                 __float128 f = 1.0;
                 if (m < ix) {
                     for (i = m + 1; i <= ix; i++)
@@ -342,7 +366,7 @@ class HyperGen {
         }
 
     private:
-        MTWrapper mt;
+        Mersenne mt;
 };
 
 #endif 

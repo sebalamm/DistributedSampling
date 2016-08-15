@@ -23,20 +23,22 @@
 #include "stocc.h"
 #include "rhyper.h"
 #include <iostream>
+#include <string>
 
 int main(int argn, char **argv) {
-    // StochasticLib1 stocc(0);
-    StochasticLib2 stocc(0);
+    StochasticLib1 stocc(0);
+    // StochasticLib2 stocc(0);
     // HyperGen gen(0);
 
-    FILE *fp = fopen("deviates", "w+");
 
-    ULONG N = pow(2,45);
-    ULONG m = pow(2,44);
-    ULONG n = pow(2,7);
+    ULONG N_pow = 20;
+    ULONG N = pow(2,N_pow);
+    ULONG m = pow(2,N_pow-1);
+    ULONG n = pow(2,10);
 
-    // for (ULONG i = 0; i < N/n; ++i) {
-    for (ULONG i = 0; i < 10000000; ++i) {
+    FILE *fp = fopen(("deviates_stoc1_" + std::to_string(N_pow)).c_str(), "w+");
+
+    for (ULONG i = 0; i < 30000000; ++i) {
         if (i % 100000 == 0) std::cout << "alive " << i / 100000 << std::endl;
 
         stocc.RandomInit(i);
