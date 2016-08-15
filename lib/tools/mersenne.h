@@ -1,5 +1,5 @@
 /******************************************************************************
- * mt_wrapper.h
+ * mersenne.h
  *
  * Source of the sampling routine
  ******************************************************************************
@@ -20,44 +20,36 @@
  *****************************************************************************/
 
 
-#ifndef _MT_WRAPPER_H_
-#define _MT_WRAPPER_H_
+#ifndef _MERSENNE_H_
+#define _MERSENNE_H_
 
-extern "C" {
-    #include "mt64.h"
-    void init_genrand64(unsigned long long seed);
-    void init_by_array64(unsigned long long init_key[], 
-                 unsigned long long key_length);
-    unsigned long long genrand64_int64(void);
-    double genrand64_real2(void);
-}
+#include <random>
 
 void EndOfProgram(void);               // System-specific exit code (userintf.cpp)
 
 void FatalError(const char *ErrorText);// System-specific error reporting (userintf.cpp)
 
-class MTWrapper {
+class Mersenne {
     public:
-        MTWrapper() {};
+        Mersenne() { Mersenne(0); };
 
-        MTWrapper(unsigned long long seed) {
-            RandomInit(seed);
-        };
+        Mersenne(unsigned long long seed) : gen(seed), dis(0.0, 1.0) {};
 
         void RandomInit(unsigned long long seed) {
-            init_genrand64(seed);
+            gen.seed(seed);
         }
 
         void RandomInitByArray(unsigned long long seeds[], unsigned long long NumSeeds) {
-            init_by_array64(seeds, NumSeeds);
+            std::seed_seq sseq(seeds, seeds + NumSeeds);
+            gen.seed(sseq);
         }
 
         unsigned long long BRandom() {
-            return genrand64_int64();
+            return gen();
         }
 
         double Random() {
-            return genrand64_real2();
+            return dis(gen);
         }
 
         unsigned long long IRandom(unsigned long long min, unsigned long long max) {
@@ -66,6 +58,10 @@ class MTWrapper {
             if (r > max) r = max;
             return r;
         }
+
+    private:
+        std::mt19937_64 gen;
+        std::uniform_real_distribution<double> dis;
 };
 
 #endif

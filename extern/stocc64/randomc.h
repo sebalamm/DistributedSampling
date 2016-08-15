@@ -62,7 +62,7 @@
 * infinitely long sequence. (Only relevant for extremely long sequences).
 *
 * uint64_t BRandom();
-* Gives 32 random bits. 
+* Gives 64 random bits. 
 *
 *
 * Example:

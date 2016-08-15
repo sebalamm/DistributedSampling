@@ -26,10 +26,10 @@
 #include <cmath>
 #include "definitions.h"
 #include "randomc.h"
-#include "mt_wrapper.h"
+#include "mersenne.h"
 #include "macros_assertions.h"
 
-template <typename RandomGenerator = MTWrapper>
+template <typename RandomGenerator = Mersenne>
 class Vitter {
     public:
         Vitter(ULONG seed) 

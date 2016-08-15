@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.8.9)
 project(sampling)
 
 set(CMAKE_CXX_COMPILER g++-5)
- 
-add_subdirectory(extern)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -Wall -march=native -O3 -g -std=c++11 -DHAVE_SSE2 -mavx2 -ffast-math")
 
 include_directories(
     app
@@ -11,8 +11,8 @@ include_directories(
     lib/sampling
     lib/tools
 )
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -Wall -march=native -O3 -g -std=c++0x -DHAVE_SSE2 -mavx2 -ffast-math")
+ 
+add_subdirectory(extern)
 
 add_executable(run_methodD "app/run_methodD.cpp")
 add_executable(run_methodH "app/run_methodH.cpp")

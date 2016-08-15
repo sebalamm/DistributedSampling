@@ -220,8 +220,8 @@
       #define STOC_BASE StocRBase
    #else
       // #define STOC_BASE CRandomMersenne     // C++ Mersenne Twister
-      #include "mt_wrapper.h"
-      #define STOC_BASE MTWrapper     // C++ Mersenne Twister
+      #include "mersenne.h"
+      #define STOC_BASE Mersenne     // C++ Mersenne Twister
       // Or choose any other random number generator base class, for example:
       //#include "randoma.h"
       //#define STOC_BASE CRandomSFMTA      // Binary library SFMT generator
