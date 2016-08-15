@@ -41,9 +41,9 @@ int main(int argn, char **argv) {
     SamplingConfig config;
 
     arg_parser args(argn, argv);
-    config.N = 1 << args.get<ULONG>("N", 30);
-    config.n = 1 << args.get<ULONG>("n", 20); // sample size
-    config.k = 1 << args.get<ULONG>("k", 10); // base case
+    config.N = (ULONG) 1 << args.get<ULONG>("N", 30);
+    config.n = (ULONG) 1 << args.get<ULONG>("n", 20); // sample size
+    config.k = (ULONG) 1 << args.get<ULONG>("k", 10); // base case
     config.seed = args.get<ULONG>("seed", 1);
     config.iterations = args.get<ULONG>("i", 1);
     config.output_file = args.get<std::string>("output", "tmp");
