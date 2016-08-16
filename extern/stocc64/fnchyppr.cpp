@@ -30,7 +30,7 @@
 Methods for class CFishersNCHypergeometric
 ***********************************************************************/
 
-CFishersNCHypergeometric::CFishersNCHypergeometric(int64_t n, int64_t m, int64_t N, __float128 odds, __float128 accuracy) {
+CFishersNCHypergeometric::CFishersNCHypergeometric(int64_t n, int64_t m, int64_t N, float128 odds, float128 accuracy) {
    // constructor
    // set parameters
    this->n = n;  this->m = m;  this->N = N;
@@ -58,8 +58,8 @@ int64_t CFishersNCHypergeometric::mode(void) {
    // Note that there is an error in Liao and Rosen's formula. 
    // Replace sgn(b) with -1 in Liao and Rosen's formula. 
 
-   __float128 A, B, C, D;                  // coefficients for quadratic equation
-   __float128 x;                           // mode
+   float128 A, B, C, D;                  // coefficients for quadratic equation
+   float128 x;                           // mode
    int64_t L = m + n - N;
    int64_t m1 = m+1, n1 = n+1;
 
@@ -71,7 +71,7 @@ int64_t CFishersNCHypergeometric::mode(void) {
       // calculate analogously to Cornfield mean
       A = 1. - odds;
       B = (m1+n1)*odds - L; 
-      C = -(__float128)m1*n1*odds;
+      C = -(float128)m1*n1*odds;
       D = B*B -4*A*C;
       D = D > 0. ? sqrt(D) : 0.;
       x = (D - B)/(A+A);
@@ -80,14 +80,14 @@ int64_t CFishersNCHypergeometric::mode(void) {
 }
 
 
-__float128 CFishersNCHypergeometric::mean(void) {
+float128 CFishersNCHypergeometric::mean(void) {
    // Find approximate mean
    // Calculation analogous with mode
-   __float128 a, b;                        // temporaries in calculation
-   __float128 mean;                        // mean
+   float128 a, b;                        // temporaries in calculation
+   float128 mean;                        // mean
 
    if (odds == 1.) {                   // simple hypergeometric
-      return __float128(m)*n/N;
+      return float128(m)*n/N;
    }
    // calculate Cornfield mean
    a = (m+n)*odds + (N-m-n); 
@@ -98,23 +98,23 @@ __float128 CFishersNCHypergeometric::mean(void) {
 }
 
 
-__float128 CFishersNCHypergeometric::variance(void) {
+float128 CFishersNCHypergeometric::variance(void) {
    // find approximate variance (poor approximation)    
-   __float128 my = mean(); // approximate mean
+   float128 my = mean(); // approximate mean
    // find approximate variance from Fisher's noncentral hypergeometric approximation
-   __float128 r1 = my * (m-my); __float128 r2 = (n-my)*(my+N-n-m);
+   float128 r1 = my * (m-my); float128 r2 = (n-my)*(my+N-n-m);
    if (r1 <= 0. || r2 <= 0.) return 0.;
-   __float128 var = N*r1*r2/((N-1)*(m*r2+(N-m)*r1));
+   float128 var = N*r1*r2/((N-1)*(m*r2+(N-m)*r1));
    if (var < 0.) var = 0.;
    return var;
 }
 
-__float128 CFishersNCHypergeometric::moments(__float128 * mean_, __float128 * var_) {
+float128 CFishersNCHypergeometric::moments(float128 * mean_, float128 * var_) {
    // calculate exact mean and variance
    // return value = sum of f(x), expected = 1.
-   __float128 y, sy=0, sxy=0, sxxy=0, me1;
+   float128 y, sy=0, sxy=0, sxxy=0, me1;
    int64_t x, xm, x1;
-   const __float128 accur = 0.1 * accuracy;     // accuracy of calculation
+   const float128 accur = 0.1 * accuracy;     // accuracy of calculation
    xm = (int64_t)mean();                      // approximation to mean
    for (x=xm; x<=xmax; x++) {
       y = probability(x);
@@ -137,9 +137,9 @@ __float128 CFishersNCHypergeometric::moments(__float128 * mean_, __float128 * va
 }
 
 
-__float128 CFishersNCHypergeometric::probability(int64_t x) {
+float128 CFishersNCHypergeometric::probability(int64_t x) {
    // calculate probability function
-   const __float128 accur = accuracy * 0.1;// accuracy of calculation
+   const float128 accur = accuracy * 0.1;// accuracy of calculation
 
    if (x < xmin || x > xmax) return 0;
 
@@ -162,7 +162,7 @@ __float128 CFishersNCHypergeometric::probability(int64_t x) {
       // first time. calculate rsum = reciprocal of sum of proportional 
       // function over all probable x values
       int64_t x1, x2;                    // x loop
-      __float128 y;                        // value of proportional function
+      float128 y;                        // value of proportional function
       x1 = (int64_t)mean();              // start at mean
       if (x1 < xmin) x1 = xmin;
       x2 = x1 + 1;
@@ -181,11 +181,11 @@ __float128 CFishersNCHypergeometric::probability(int64_t x) {
    return exp(lng(x)) * rsum;          // function value
 }
 
-__float128 CFishersNCHypergeometric::probabilityRatio(int64_t x, int64_t x0) {
+float128 CFishersNCHypergeometric::probabilityRatio(int64_t x, int64_t x0) {
    // Calculate probability ratio f(x)/f(x0)
    // This is much faster than calculating a single probability because
    // rsum is not needed
-   __float128 a1, a2, a3, a4, f1, f2, f3, f4;
+   float128 a1, a2, a3, a4, f1, f2, f3, f4;
    int64_t y, dx = x - x0;
    int64_t invert = 0;
 
@@ -232,7 +232,7 @@ __float128 CFishersNCHypergeometric::probabilityRatio(int64_t x, int64_t x0) {
    return f1;
 }
 
-__float128 CFishersNCHypergeometric::MakeTable(__float128 * table, int64_t MaxLength, int64_t * xfirst, int64_t * xlast, __float128 cutoff) {
+float128 CFishersNCHypergeometric::MakeTable(float128 * table, int64_t MaxLength, int64_t * xfirst, int64_t * xlast, float128 cutoff) {
    // Makes a table of Fisher's noncentral hypergeometric probabilities.
    // Results are returned in the array table of size MaxLength.
    // The values are scaled so that the highest value is 1. The return value
@@ -250,9 +250,9 @@ __float128 CFishersNCHypergeometric::MakeTable(__float128 * table, int64_t MaxLe
    //
    // The function will return the desired length of table when MaxLength = 0.
 
-   __float128 f;                           // probability function value
-   __float128 sum;                         // sum of table values
-   __float128 a1, a2, b1, b2;              // factors in recursive calculation of f(x)
+   float128 f;                           // probability function value
+   float128 sum;                         // sum of table values
+   float128 a1, a2, b1, b2;              // factors in recursive calculation of f(x)
    int64_t x;                          // x value
    int64_t x1, x2;                     // lowest and highest x
    int64_t i, i0, i1, i2;              // table index
@@ -283,7 +283,7 @@ __float128 CFishersNCHypergeometric::MakeTable(__float128 * table, int64_t MaxLe
       // Return UseTable and LengthNeeded
       DesiredLength = x2 - x1 + 1;     // max length of table
       if (DesiredLength > 200) {
-         __float128 sd = sqrt(variance()); // calculate approximate standard deviation
+         float128 sd = sqrt(variance()); // calculate approximate standard deviation
          // estimate number of standard deviations to include from normal distribution
          i = (int64_t)(NumSD(accuracy) * sd + 0.5);
          if (DesiredLength > i) DesiredLength = i;
@@ -354,7 +354,7 @@ __float128 CFishersNCHypergeometric::MakeTable(__float128 * table, int64_t MaxLe
 }
 
 
-__float128 CFishersNCHypergeometric::lng(int64_t x) {
+float128 CFishersNCHypergeometric::lng(int64_t x) {
    // natural log of proportional function
    // returns lambda = log(m!*x!/(m-x)!*m2!*x2!/(m2-x2)!*odds^x)
    int64_t x2 = n - x,  m2 = N - m;
@@ -367,10 +367,10 @@ __float128 CFishersNCHypergeometric::lng(int64_t x) {
   case 0:   // x unchanged
      break;
   case 1:   // x incremented. calculate from previous value
-     xFac += log (__float128(x) * (m2-x2) / (__float128(x2+1)*(m-x+1)));
+     xFac += log (float128(x) * (m2-x2) / (float128(x2+1)*(m-x+1)));
      break;
   case -1:  // x decremented. calculate from previous value
-     xFac += log (__float128(x2) * (m-x) / (__float128(x+1)*(m2-x2+1)));
+     xFac += log (float128(x2) * (m-x) / (float128(x+1)*(m2-x2+1)));
      break;
   default: DEFLT: // calculate all
      xFac = LnFac(x) + LnFac(x2) + LnFac(m-x) + LnFac(m2-x2);
@@ -384,7 +384,7 @@ __float128 CFishersNCHypergeometric::lng(int64_t x) {
 calculation methods in class CMultiFishersNCHypergeometric
 ***********************************************************************/
 
-CMultiFishersNCHypergeometric::CMultiFishersNCHypergeometric(int64_t n_, int64_t * m_, __float128 * odds_, int64_t colors_, __float128 accuracy_) {
+CMultiFishersNCHypergeometric::CMultiFishersNCHypergeometric(int64_t n_, int64_t * m_, float128 * odds_, int64_t colors_, float128 accuracy_) {
    // constructor
    int64_t N1;
    int64_t i;
@@ -410,14 +410,14 @@ CMultiFishersNCHypergeometric::CMultiFishersNCHypergeometric(int64_t n_, int64_t
 }
 
 
-void CMultiFishersNCHypergeometric::mean(__float128 * mu) {
+void CMultiFishersNCHypergeometric::mean(float128 * mu) {
    // calculates approximate mean of multivariate Fisher's noncentral
    // hypergeometric distribution. Result is returned in mu[0..colors-1].
    // The calculation is reasonably fast.
    // Note: The version in BiasedUrn package deals with unused colors
-   __float128 r, r1;                       // iteration variable
-   __float128 q;                           // mean of color i
-   __float128 W;                           // total weight
+   float128 r, r1;                       // iteration variable
+   float128 q;                           // mean of color i
+   float128 W;                           // total weight
    int64_t i;                              // color index
    int64_t iter = 0;                       // iteration counter
 
@@ -438,7 +438,7 @@ void CMultiFishersNCHypergeometric::mean(__float128 * mu) {
 
    // initial guess for r
    for (i=0, W=0.; i < colors; i++) W += m[i] * odds[i];
-   r = (__float128)n * N / ((N-n)*W);
+   r = (float128)n * N / ((N-n)*W);
 
    // iteration loop to find r
    do {
@@ -458,14 +458,14 @@ void CMultiFishersNCHypergeometric::mean(__float128 * mu) {
 }
 
 
-void CMultiFishersNCHypergeometric::variance(__float128 * var) {
+void CMultiFishersNCHypergeometric::variance(float128 * var) {
    // calculates approximate variance of multivariate Fisher's noncentral
    // hypergeometric distribution (accuracy is not too good).
    // Result is returned in variance[0..colors-1].
    // The calculation is reasonably fast.
    // Note: The version in BiasedUrn package deals with unused colors
-   __float128 r1, r2;
-   __float128 mu[MAXCOLORS];
+   float128 r1, r2;
+   float128 mu[MAXCOLORS];
    int64_t i;
    mean(mu);
    for (i=0; i<colors; i++) {
@@ -481,7 +481,7 @@ void CMultiFishersNCHypergeometric::variance(__float128 * var) {
 }
 
 
-__float128 CMultiFishersNCHypergeometric::probability(int64_t * x) {
+float128 CMultiFishersNCHypergeometric::probability(int64_t * x) {
    // Calculate probability function.
    // Note: The first-time call takes very long time because it requires
    // a calculation of all possible x combinations with probability >
@@ -508,7 +508,7 @@ __float128 CMultiFishersNCHypergeometric::probability(int64_t * x) {
 }
 
 
-__float128 CMultiFishersNCHypergeometric::moments(__float128 * mean, __float128 * variance, int64_t * combinations) {
+float128 CMultiFishersNCHypergeometric::moments(float128 * mean, float128 * variance, int64_t * combinations) {
    // calculates mean and variance of the Fisher's noncentral hypergeometric 
    // distribution by calculating all combinations of x-values with
    // probability > accuracy.
@@ -583,12 +583,12 @@ void CMultiFishersNCHypergeometric::SumOfAll() {
 }
 
 
-__float128 CMultiFishersNCHypergeometric::loop(int64_t n, int64_t c) {
+float128 CMultiFishersNCHypergeometric::loop(int64_t n, int64_t c) {
    // recursive function to loop through all combinations of x-values.
    // used by SumOfAll
    int64_t x, x0;                        // x of color c
    int64_t xmin, xmax;                   // min and max of x[c]
-   __float128 s1, s2, sum = 0.;            // sum of g(x) values
+   float128 s1, s2, sum = 0.;            // sum of g(x) values
    int64_t i;                              // loop counter
 
    if (c < colors-1) {
@@ -628,9 +628,9 @@ __float128 CMultiFishersNCHypergeometric::loop(int64_t n, int64_t c) {
 }
 
 
-__float128 CMultiFishersNCHypergeometric::lng(int64_t * x) {
+float128 CMultiFishersNCHypergeometric::lng(int64_t * x) {
    // natural log of proportional function g(x)
-   __float128 y = 0.;
+   float128 y = 0.;
    int64_t i;
    for (i = 0; i < colors; i++) {
       y += x[i]*logodds[i] - LnFac(x[i]) - LnFac(m[i]-x[i]);
