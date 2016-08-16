@@ -3,6 +3,10 @@ project(sampling)
 
 set(CMAKE_CXX_COMPILER g++-5)
 
+if(NOT CMAKE_BUILD_TYPE) 
+    set(CMAKE_BUILD_TYPE Release)
+endif(NOT CMAKE_BUILD_TYPE)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -Wall -march=native -O3 -g -std=c++11 -DHAVE_SSE2 -mavx2 -ffast-math")
 
 include_directories(
