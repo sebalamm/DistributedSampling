@@ -203,7 +203,8 @@
 #include <math.h>
 #include "randomc.h"
 
-typedef __float128 float128;
+// typedef __float128 float128;
+typedef double float128;
 
 #ifdef R_BUILD
    #include "stocR.h"           // Include this when building R-language interface
