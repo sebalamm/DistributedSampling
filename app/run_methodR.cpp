@@ -52,8 +52,9 @@ int main(int argn, char **argv) {
     fp = fopen(filename.c_str(), "w+");
 
     // Resulting samples
-    std::vector<ULONG> sample;
-    sample.reserve(config.n);
+    // std::vector<ULONG> sample;
+    // sample.reserve(config.n);
+    ULONG samples_taken = 0;
 
     // Statistics
     timer t;
@@ -61,7 +62,8 @@ int main(int argn, char **argv) {
 
     std::cout << "warmup" << std::endl;
     for (ULONG iteration = 0; iteration < std::min((ULONG)100, config.iterations); ++iteration) {
-        sample.clear();
+        // sample.clear();
+        samples_taken = 0;
 
         // Compute sample
         HashSampling<> hs(config.seed + iteration, config.k);
@@ -70,17 +72,18 @@ int main(int argn, char **argv) {
                    config.n,
                    [&](ULONG elem) {
                        // fprintf(fp, "%lld\n", elem);
-                       sample.push_back(elem);
+                       // sample.push_back(elem);
+                       samples_taken++;
                    });
 
         
-        // if (!std::is_sorted(sample.begin(), sample.end())) std::cout << "not sorted!" << std::endl;
-        if (sample.size() != config.n) std::cout << "wrong size " << sample.size() << "!" << std::endl;
+        // if (sample.size() != config.n) std::cout << "wrong size " << sample.size() << "!" << std::endl;
     }
 
     std::cout << "measurements" << std::endl;
     for (ULONG iteration = 0; iteration < config.iterations; ++iteration) {
-        sample.clear();
+        // sample.clear();
+        samples_taken = 0;
         t.restart();
 
         // Compute sample
@@ -90,12 +93,10 @@ int main(int argn, char **argv) {
                    config.n,
                    [&](ULONG elem) {
                        // fprintf(fp, "%lld\n", elem);
-                       sample.push_back(elem);
+                       // sample.push_back(elem);
+                       samples_taken++;
                    });
 
-        for (ULONG i = 1; i < sample.size(); i++) {
-            if (sample[i] == sample[i-1]) std::cout << "duplicates!" << std::endl;
-        }
         double time = t.elapsed();
         stats.push(time);    
     }

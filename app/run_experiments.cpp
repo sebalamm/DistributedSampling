@@ -31,14 +31,14 @@ int main(int argn, char **argv) {
     // HyperGen gen(0);
 
 
-    ULONG N_pow = 20;
+    ULONG N_pow = 60;
     ULONG N = pow(2,N_pow);
     ULONG m = pow(2,N_pow-1);
-    ULONG n = pow(2,10);
+    ULONG n = pow(2,12);
 
     FILE *fp = fopen(("deviates_stoc1_" + std::to_string(N_pow)).c_str(), "w+");
 
-    for (ULONG i = 0; i < 30000000; ++i) {
+    for (ULONG i = 0; i < 10000000; ++i) {
         if (i % 100000 == 0) std::cout << "alive " << i / 100000 << std::endl;
 
         stocc.RandomInit(i);

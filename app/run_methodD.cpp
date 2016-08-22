@@ -51,8 +51,9 @@ int main(int argn, char **argv) {
     fp = fopen(filename.c_str(), "w+");
     
     // Resulting samples
-    std::vector<ULONG> sample;
-    sample.reserve(config.n);
+    // std::vector<ULONG> sample;
+    // sample.reserve(config.n);
+    ULONG samples_taken = 0;
 
     // Statistics
     timer t;
@@ -60,7 +61,8 @@ int main(int argn, char **argv) {
 
     std::cout << "warmup" << std::endl;
     for (ULONG iteration = 0; iteration < std::min((ULONG)100, config.iterations); ++iteration) {
-        sample.clear();
+        // sample.clear();
+        samples_taken = 0;
 
         // Compute sample
         Vitter<> vi(config.seed + iteration);
@@ -68,13 +70,15 @@ int main(int argn, char **argv) {
                   config.n,
                   [&](ULONG elem) {
                       // fprintf(fp, "%lld\n", elem);
-                      sample.push_back(elem);
+                      // sample.push_back(elem);
+                      samples_taken++;
                   });
     }
 
     std::cout << "measurements" << std::endl;
     for (ULONG iteration = 0; iteration < config.iterations; ++iteration) {
-        sample.clear();
+        // sample.clear();
+        samples_taken = 0;
         t.restart();
 
         // Compute sample
@@ -83,7 +87,8 @@ int main(int argn, char **argv) {
                   config.n,
                   [&](ULONG elem) {
                       // fprintf(fp, "%lld\n", elem);
-                      sample.push_back(elem);
+                      // sample.push_back(elem);
+                      samples_taken++;
                   });
 
         double time = t.elapsed();
