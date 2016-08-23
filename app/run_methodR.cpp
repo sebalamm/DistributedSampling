@@ -52,9 +52,9 @@ int main(int argn, char **argv) {
     fp = fopen(filename.c_str(), "w+");
 
     // Resulting samples
-    // std::vector<ULONG> sample;
-    // sample.reserve(config.n);
-    ULONG samples_taken = 0;
+    std::vector<ULONG> sample;
+    sample.reserve(config.n);
+    // ULONG samples_taken = 0;
 
     // Statistics
     timer t;
@@ -62,8 +62,8 @@ int main(int argn, char **argv) {
 
     std::cout << "warmup" << std::endl;
     for (ULONG iteration = 0; iteration < std::min((ULONG)100, config.iterations); ++iteration) {
-        // sample.clear();
-        samples_taken = 0;
+        sample.clear();
+        // samples_taken = 0;
 
         // Compute sample
         HashSampling<> hs(config.seed + iteration, config.k);
@@ -72,8 +72,8 @@ int main(int argn, char **argv) {
                    config.n,
                    [&](ULONG elem) {
                        // fprintf(fp, "%lld\n", elem);
-                       // sample.push_back(elem);
-                       samples_taken++;
+                       sample.push_back(elem);
+                       // samples_taken++;
                    });
 
         
@@ -82,8 +82,8 @@ int main(int argn, char **argv) {
 
     std::cout << "measurements" << std::endl;
     for (ULONG iteration = 0; iteration < config.iterations; ++iteration) {
-        // sample.clear();
-        samples_taken = 0;
+        sample.clear();
+        // samples_taken = 0;
         t.restart();
 
         // Compute sample
@@ -93,8 +93,8 @@ int main(int argn, char **argv) {
                    config.n,
                    [&](ULONG elem) {
                        // fprintf(fp, "%lld\n", elem);
-                       // sample.push_back(elem);
-                       samples_taken++;
+                       sample.push_back(elem);
+                       // samples_taken++;
                    });
 
         double time = t.elapsed();

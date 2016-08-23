@@ -62,9 +62,9 @@ int main(int argn, char **argv) {
     }
     
     // Resulting samples
-    // std::vector<ULONG> sample;
-    // sample.reserve(config.n);
-    ULONG samples_taken = 0;
+    std::vector<ULONG> sample;
+    sample.reserve((config.n / size) * 1.2);
+    // ULONG samples_taken = 0;
 
     // Timers
     timer t;
@@ -72,8 +72,8 @@ int main(int argn, char **argv) {
 
     std::cout << "warmup" << std::endl;
     for (ULONG iteration = 0; iteration < std::min((ULONG)100, config.iterations); ++iteration) {
-        // sample.clear();
-        samples_taken = 0;
+        sample.clear();
+        // samples_taken = 0;
         MPI_Barrier(MPI_COMM_WORLD);
 
         // Compute sample
@@ -84,15 +84,15 @@ int main(int argn, char **argv) {
                    rank,
                    [&](ULONG elem) {
                        // fprintf(fp, "%lld\n", elem);
-                       // sample.push_back(elem);
-                       samples_taken++;
+                       sample.push_back(elem);
+                       // samples_taken++;
                    });
     }
 
     std::cout << "measurements" << std::endl;
     for (ULONG iteration = 0; iteration < config.iterations; ++iteration) {
-        // sample.clear();
-        samples_taken = 0;
+        sample.clear();
+        // samples_taken = 0;
         MPI_Barrier(MPI_COMM_WORLD);
         t.restart();
 
@@ -104,8 +104,8 @@ int main(int argn, char **argv) {
                    rank,
                    [&](ULONG elem) {
                        // fprintf(fp, "%lld\n", elem);
-                       // sample.push_back(elem);
-                       samples_taken++;
+                       sample.push_back(elem);
+                       // samples_taken++;
                    });
 
         double time = t.elapsed();
