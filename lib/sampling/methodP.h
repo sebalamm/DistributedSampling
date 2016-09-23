@@ -26,7 +26,6 @@
 #include <vector>
 #include "definitions.h"
 #include "gen_hyper.h"
-#include "randomc.h"
 #include "tools/spooky_hash.h"
 #include "sampling/methodR.h"
 
