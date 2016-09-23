@@ -3,6 +3,9 @@
 
 #include "definitions.h"
 
+#ifndef _GEN_HYPER_H_
+#define _GEN_HYPER_H_
+
 class GenHyper {
     public:
         GenHyper(ULONG seed) {
@@ -23,6 +26,10 @@ class GenHyper {
             mpfr_set_d(hyp_bound, -1.0, MPFR_RNDN);
 
             gmp_randinit_mt(rng);
+            gmp_randseed_ui(rng, seed);
+        }
+
+        void RandomInit(ULONG seed) {
             gmp_randseed_ui(rng, seed);
         }
 
@@ -497,3 +504,4 @@ class GenHyper {
         }
 };
 
+#endif _GEN_HYPER_H_
