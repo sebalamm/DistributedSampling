@@ -25,7 +25,6 @@
 
 #include <cmath>
 #include "definitions.h"
-#include "randomc.h"
 #include "mersenne.h"
 #include "macros_assertions.h"
 

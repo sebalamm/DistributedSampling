@@ -24,13 +24,12 @@
 #define _METHOD_R_H_
 
 #include "definitions.h"
-#include "stocc.h"
-#include "randomc.h"
+#include "gen_hyper.h"
 #include "sampling/methodD.h"
 #include "sampling/methodH.h"
 #include "sampling/methodSH.h"
 
-template <typename Stocc = StochasticLib1, typename BaseSampler = HashSampling<>>
+template <typename Stocc = GenHyper, typename BaseSampler = HashSampling<>>
 class SeqDivideSampling {
     public:
         typedef BaseSampler base_type;
