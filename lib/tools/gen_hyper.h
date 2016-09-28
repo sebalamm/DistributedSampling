@@ -1,3 +1,5 @@
+#include <cstddef> 
+
 #include <mpfr.h>
 #include <gmp.h>
 
@@ -173,4 +175,4 @@ class GenHyper {
         }
 };
 
-#endif _GEN_HYPER_H_
+#endif 
