@@ -8,6 +8,8 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif(NOT CMAKE_BUILD_TYPE)
 
+find_package(MPI REQUIRED)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -Wall -march=native -O3 -g -std=c++11 -DHAVE_SSE2 -mavx2 -ffast-math")
 
 include_directories(
@@ -16,6 +18,8 @@ include_directories(
     lib/sampling
     lib/tools
 )
+
+include_directories(${MPI_INCLUDE_PATH})
  
 add_subdirectory(extern)
 
@@ -24,7 +28,7 @@ add_executable(run_methodH "app/run_methodH.cpp")
 add_executable(run_methodR "app/run_methodR.cpp")
 add_executable(run_methodSH "app/run_methodSH.cpp")
 add_executable(run_methodSR "app/run_methodSR.cpp")
-# add_executable(run_methodP "app/run_methodP.cpp")
+add_executable(run_methodP "app/run_methodP.cpp")
 
 set(LIBS 
     dsfmt
@@ -32,6 +36,7 @@ set(LIBS
     city
     mpfr
     gmp
+    ${MPI_LIBRARIES}
 )
  
 target_link_libraries(run_methodD LINK_PUBLIC ${LIBS})
@@ -39,4 +44,4 @@ target_link_libraries(run_methodH LINK_PUBLIC ${LIBS})
 target_link_libraries(run_methodR LINK_PUBLIC ${LIBS})
 target_link_libraries(run_methodSH LINK_PUBLIC ${LIBS})
 target_link_libraries(run_methodSR LINK_PUBLIC ${LIBS})
-# target_link_libraries(run_methodP LINK_PUBLIC ${LIBS})
+target_link_libraries(run_methodP LINK_PUBLIC ${LIBS})
