@@ -81,25 +81,25 @@ class GenHyper {
            // C5 =  1./1260.,                  // use r^5 term if FAK_LEN < 50
            // C7 = -1./1680.;                  // use r^7 term if FAK_LEN < 20
            // static variables
-           // static float128 fac_table[FAK_LEN];   // table of ln(n!):
-           // static int64_t initialized = 0;         // remember if fac_table has been initialized
+           static const ULONG FAK_LEN = 1024;
+           static mpfr::mpreal fac_table[FAK_LEN];   // table of ln(n!):
+           static bool initialized = false;         // remember if fac_table has been initialized
 
-           // if (n < FAK_LEN) {
-           //    if (n <= 1) {
-           //       if (n < 0) FatalError("Parameter negative in LnFac function");  
-           //       return 0;
-           //    }
-           //    if (!initialized) {              // first time. Must initialize table
-           //       // make table of ln(n!)
-           //       float128 sum = fac_table[0] = 0.;
-           //       for (int64_t i=1; i<FAK_LEN; i++) {
-           //          sum += log(float128(i));
-           //          fac_table[i] = sum;
-           //       }
-           //       initialized = 1;
-           //    }
-           //    return fac_table[n];
-           // }
+           if ((ULONG)n < FAK_LEN) {
+              if (n <= 1) {
+                 return 0;
+              }
+              if (!initialized) {              // first time. Must initialize table
+                 // make table of ln(n!)
+                  mpfr::mpreal sum = fac_table[0] = 0.;
+                 for (ULONG i = 1; i < FAK_LEN; i++) {
+                    sum += log(mpfr::mpreal(i));
+                    fac_table[i] = sum;
+                 }
+                 initialized = 1;
+              }
+              return fac_table[(ULONG)n];
+           }
            // not found in table. use Stirling approximation
            // float128  n1, r;
            mpfr::mpreal n1 = n;  
