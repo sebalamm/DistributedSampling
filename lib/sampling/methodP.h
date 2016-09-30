@@ -63,8 +63,7 @@ class ParDivideSampling {
             ULONG h = H::hash(hash_seed + j + k);
             stocc.RandomInit(h);
             ULONG N_split = N(m) - N(j-1);
-            // TODO: Merge hashing with random variates to reduce initialization overhead
-            ULONG x = stocc.Hypergeometric(N_split, n, N(k) - N(j-1)); 
+            ULONG x = stocc.Hypergeometric(n, N_split, N(k) - N(j-1)); 
             if (i < m) sample(x, j, m, i, callback, offset);
             else sample(n-x, m + 1, k, i, callback, offset + N_split);
         }

@@ -51,8 +51,7 @@ class SeqDivideSampling {
             } 
             
             ULONG N_split = N/2;
-            // std::cout << "draw " << n << " from " << N << " with " << N_split << std::endl;
-            ULONG x = stocc.Hypergeometric(N_split, n, N); 
+            ULONG x = stocc.Hypergeometric(n, N_split, N); 
             sample(N_split, x, callback, offset);
             sample(N-N_split, n-x, callback, offset + N_split);
         }

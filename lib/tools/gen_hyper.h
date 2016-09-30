@@ -12,7 +12,7 @@
 class GenHyper {
     public:
         GenHyper(ULONG seed) {
-            mpfr::mpreal::set_default_prec(200);
+            mpfr::mpreal::set_default_prec(128);
 
             hyp_n_last = -1.0;
             hyp_m_last = -1.0;
