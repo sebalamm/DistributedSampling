@@ -1,3 +1,6 @@
+#ifndef _VAR_GEN_H_
+#define _VAR_GEN_H_
+
 #include <cstddef> 
 
 #include <mpfr.h>
@@ -5,9 +8,6 @@
 
 #include "mpreal.h"
 #include "definitions.h"
-
-#ifndef _VAR_GEN_H_
-#define _VAR_GEN_H_
 
 class VarGen {
     public:

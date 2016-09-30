@@ -34,8 +34,9 @@ class SeqDivideSampling {
     public:
         typedef BaseSampler base_type;
 
-        SeqDivideSampling(BaseSampler &base_sampler, ULONG base_size, ULONG seed) 
-            : stocc(seed),
+        SeqDivideSampling(SamplingConfig &config, BaseSampler &base_sampler, ULONG base_size, ULONG seed) 
+            : config(config),
+              stocc(seed),
               base_sampler(std::move(base_sampler)),
               base_size(base_size)
         { }
@@ -51,12 +52,17 @@ class SeqDivideSampling {
             } 
             
             ULONG N_split = N/2;
-            ULONG x = stocc.Hypergeometric(n, N_split, N); 
+            ULONG x = 0;
+            if (config.use_binom)
+                x = stocc.Binomial(n, N_split/N); 
+            else 
+                x = stocc.Hypergeometric(n, N_split, N); 
             sample(N_split, x, callback, offset);
             sample(N-N_split, n-x, callback, offset + N_split);
         }
 
     private:
+        SamplingConfig &config;
         Stocc stocc;
         BaseSampler base_sampler;
         ULONG base_size;

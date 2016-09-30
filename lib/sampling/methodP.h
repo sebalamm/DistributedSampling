@@ -54,7 +54,7 @@ class ParDivideSampling {
                 typename LocalSampler::base_type base_sampler(h, config.k);
                 // Allocate hash table for base case
 
-                LocalSampler local_sampler(base_sampler, config.k, h);
+                LocalSampler local_sampler(config, base_sampler, config.k, h);
                 local_sampler.sample(N(i+1) - N(i), n, callback, offset);
                 return;
             } 
@@ -63,7 +63,11 @@ class ParDivideSampling {
             ULONG h = H::hash(hash_seed + j + k);
             stocc.RandomInit(h);
             ULONG N_split = N(m) - N(j-1);
-            ULONG x = stocc.Hypergeometric(n, N_split, N(k) - N(j-1)); 
+            ULONG x = 0;
+            if (config.use_binom)
+                x = stocc.Binomial(n, N_split/(N(k) - N(j-1))); 
+            else
+                x = stocc.Hypergeometric(n, N_split, N(k) - N(j-1)); 
             if (i < m) sample(x, j, m, i, callback, offset);
             else sample(n-x, m + 1, k, i, callback, offset + N_split);
         }

@@ -24,6 +24,7 @@
 
 #include "timer.h"
 #include "macros_assertions.h"
+#include "parse_parameters.h"
 #include "sampling_config.h"
 #include "sampling/methodR.h"
 #include "tools/benchmark.h"
@@ -32,14 +33,7 @@
 int main(int argn, char **argv) {
     // Read command-line args
     SamplingConfig config;
-
-    arg_parser args(argn, argv);
-    config.N = (ULONG) 1 << args.get<ULONG>("N", 30);
-    config.n = (ULONG) 1 << args.get<ULONG>("n", 20); // sample size
-    config.k = (ULONG) 1 << args.get<ULONG>("k", 10); // base case
-    config.seed = args.get<ULONG>("seed", 1);
-    config.iterations = args.get<ULONG>("i", 1);
-    config.output_file = args.get<std::string>("output", "tmp");
+    parse_parameters(argn, argv, config); 
 
     // Main algorithm
     FILE *fp;
@@ -67,7 +61,7 @@ int main(int argn, char **argv) {
 
         // Compute sample
         HashSampling<> hs(config.seed + iteration, config.k);
-        SeqDivideSampling<> sds(hs, config.k, config.seed + iteration);
+        SeqDivideSampling<> sds(config, hs, config.k, config.seed + iteration);
         sds.sample(config.N,
                    config.n,
                    [&](ULONG elem) {
@@ -88,7 +82,7 @@ int main(int argn, char **argv) {
 
         // Compute sample
         HashSampling<> hs(config.seed + iteration, config.k);
-        SeqDivideSampling<> sds(hs, config.k, config.seed + iteration);
+        SeqDivideSampling<> sds(config, hs, config.k, config.seed + iteration);
         sds.sample(config.N,
                    config.n,
                    [&](ULONG elem) {
