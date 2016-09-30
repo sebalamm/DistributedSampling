@@ -6,13 +6,24 @@
 #include "mpreal.h"
 #include "definitions.h"
 
-#ifndef _GEN_HYPER_H_
-#define _GEN_HYPER_H_
+#ifndef _VAR_GEN_H_
+#define _VAR_GEN_H_
 
-class GenHyper {
+class VarGen {
     public:
-        GenHyper(ULONG seed) {
+        VarGen(ULONG seed) {
             mpfr::mpreal::set_default_prec(128);
+
+            bino_n_last = -1.0;
+            bino_p_last = -1.0;
+
+            bino_h = -1.0;
+            bino_a = -1.0;
+            bino_bound = -1.0;
+
+            bino_mode = -1.0;
+            bino_r1 = -1.0;
+            bino_g = -1.0;
 
             hyp_n_last = -1.0;
             hyp_m_last = -1.0;
@@ -29,6 +40,26 @@ class GenHyper {
 
         void RandomInit(ULONG seed) {
             gmp_randseed_ui(rng, seed);
+        }
+
+        ULONG Binomial(ULONG n, double p) {
+            ULONG inv = 0;                    // invert
+            ULONG x;                          // result
+
+            if (p > 0.5) {                      // faster calculation by inversion
+                p = 1. - p;  inv = 1;
+            }
+
+            mpfr::mpreal nf = n;
+            mpfr::mpreal pf = p;
+            // ratio of uniforms method
+            mpfr::mpreal bin;
+            BinomialRatioOfUniforms(nf, pf, bin);
+            x = (ULONG)bin;
+            if (inv) {
+                x = n - x;      // undo inversion
+            }
+            return x;
         }
 
         ULONG Hypergeometric(ULONG n, ULONG m, ULONG N) {
@@ -63,8 +94,13 @@ class GenHyper {
         }
 
     private:
+        mpfr::mpreal bino_n_last, bino_p_last;
+        mpfr::mpreal bino_h, bino_a, bino_bound;
+        mpfr::mpreal bino_mode, bino_r1, bino_g;
+
         mpfr::mpreal hyp_n_last, hyp_m_last, hyp_N_last;
         mpfr::mpreal hyp_h, hyp_a, hyp_fm, hyp_bound;
+
         gmp_randstate_t rng;
 
         const double SHAT1 = 2.943035529371538573;    // 8/e
@@ -107,8 +143,63 @@ class GenHyper {
            return (n1 + 0.5)*log(n1) - n1 + C0 + r*(C1 + r*r*C3);
         }
 
+
         void fc_lnpk(mpfr::mpreal & k, mpfr::mpreal & L, mpfr::mpreal & m, mpfr::mpreal & n, mpfr::mpreal & result) {
             result = LnFac(k) + LnFac(m - k) + LnFac(n - k) + LnFac(L + k);
+        }
+
+        void BinomialRatioOfUniforms(mpfr::mpreal & n, mpfr::mpreal & p, mpfr::mpreal & result) {
+            /* 
+            Subfunction for Binomial distribution. Assumes p < 0.5.
+
+            Uses the Ratio-of-Uniforms rejection method.
+
+            The computation time hardly depends on the parameters, except that it matters
+            a lot whether parameters are within the range where the LnFac function is 
+            tabulated.
+
+            Reference: E. Stadlober: "The ratio of uniforms approach for generating
+            discrete random variates". Journal of Computational and Applied Mathematics,
+            vol. 31, no. 1, 1990, pp. 181-189.
+            */   
+            mpfr::mpreal u;                           // uniform random
+            mpfr::mpreal q1;                          // 1-p
+            mpfr::mpreal np;                          // n*p
+            mpfr::mpreal var;                         // variance
+            mpfr::mpreal lf;                          // ln(f(x))
+            mpfr::mpreal x;                           // real sample
+            mpfr::mpreal k;                           // integer sample
+
+            if (bino_n_last != n || bino_p_last != p) {    // Set_up
+                bino_n_last = n;
+                bino_p_last = p;
+                q1 = 1.0 - p;
+                np = n * p;
+                bino_mode = floor(np + p);             // mode
+                bino_a = np + 0.5;                         // hat center
+                bino_r1 = log(p / q1);
+                bino_g = LnFac(bino_mode) + LnFac(n-bino_mode);
+                var = np * q1;                             // variance
+                bino_h = sqrt(SHAT1 * (var+0.5)) + SHAT2;  // hat width
+                bino_bound = floor(bino_a + 6.0 * bino_h);// safety-bound
+                if (bino_bound > n) bino_bound = n;        // safety-bound
+            }
+
+            while (1) {                                   // rejection loop
+                mpfr_urandomb(u.mpfr_ptr(), rng);
+                if (u == 0) continue;                      // avoid division by 0
+                mpfr_urandomb(x.mpfr_ptr(), rng);
+                x = bino_a + bino_h * (x - 0.5) / u;
+                if (x < 0.) continue;    // reject, avoid overflow
+                k = floor(x);                            // truncate
+                lf = (k-bino_mode)*bino_r1+bino_g-LnFac(k)-LnFac(n-k);// ln(f(k))
+                if (u * (4.0 - u) - 3.0 <= lf) break;      // lower squeeze accept
+                if (u * (u - lf) > 1.0) continue;          // upper squeeze reject
+                if (2.0 * log(u) <= lf) break;             // final acceptance
+            }
+
+            // return k;
+            result = k;
         }
 
         void HypRatioOfUnifoms (mpfr::mpreal & n, mpfr::mpreal & m, mpfr::mpreal & N, mpfr::mpreal & result) {
