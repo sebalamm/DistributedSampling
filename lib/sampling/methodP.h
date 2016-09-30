@@ -65,7 +65,7 @@ class ParDivideSampling {
             ULONG N_split = N(m) - N(j-1);
             ULONG x = 0;
             if (config.use_binom)
-                x = stocc.Binomial(n, N_split/(N(k) - N(j-1))); 
+                x = stocc.Binomial(n, (double)N_split/(N(k) - N(j-1))); 
             else
                 x = stocc.Hypergeometric(n, N_split, N(k) - N(j-1)); 
             if (i < m) sample(x, j, m, i, callback, offset);

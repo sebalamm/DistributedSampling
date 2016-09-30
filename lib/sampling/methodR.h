@@ -54,7 +54,7 @@ class SeqDivideSampling {
             ULONG N_split = N/2;
             ULONG x = 0;
             if (config.use_binom)
-                x = stocc.Binomial(n, N_split/N); 
+                x = stocc.Binomial(n, (double)N_split/N); 
             else 
                 x = stocc.Hypergeometric(n, N_split, N); 
             sample(N_split, x, callback, offset);
