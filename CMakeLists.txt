@@ -30,7 +30,11 @@ add_executable(run_methodSH "app/run_methodSH.cpp")
 add_executable(run_methodSR "app/run_methodSR.cpp")
 add_executable(run_methodP "app/run_methodP.cpp")
 
+# add_executable(test_hyper "app/test_hyper.cpp")
+# add_executable(test_binom "app/test_binom.cpp")
+
 set(LIBS 
+    stocc
     dsfmt
     spooky
     city
@@ -45,3 +49,6 @@ target_link_libraries(run_methodR LINK_PUBLIC ${LIBS})
 target_link_libraries(run_methodSH LINK_PUBLIC ${LIBS})
 target_link_libraries(run_methodSR LINK_PUBLIC ${LIBS})
 target_link_libraries(run_methodP LINK_PUBLIC ${LIBS})
+
+# target_link_libraries(test_hyper LINK_PUBLIC ${LIBS})
+# target_link_libraries(test_binom LINK_PUBLIC ${LIBS})

@@ -25,11 +25,12 @@
 
 #include <vector>
 #include "definitions.h"
+#include "stocc.h"
 #include "var_gen.h"
 #include "tools/spooky_hash.h"
 #include "sampling/methodR.h"
 
-template <typename Stocc = VarGen, typename LocalSampler = SeqDivideSampling<>, typename H = Spooky>
+template <typename Stocc = StochasticLib1, typename LocalSampler = SeqDivideSampling<>, typename H = Spooky>
 class ParDivideSampling {
     public:
         ParDivideSampling(SamplingConfig &config, ULONG seed, PEID size) 
