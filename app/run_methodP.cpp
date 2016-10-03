@@ -108,7 +108,6 @@ int main(int argn, char **argv) {
         if (rank == ROOT) stats.push(max_time);
     }
 
-
     if (rank == ROOT) {
         std::cout << "RESULT runner=P" 
                   << " n=" << config.n
