@@ -47,7 +47,7 @@ class HashSampling {
             dsfmt_init_gen_rand(&dsfmt, seed);
             max_blocksize = std::max(std::min(n, blocksize), (ULONG)dsfmt_get_min_array_size());
             max_blocksize += (max_blocksize & 0x1); // needs to be even
-            randblock.reserve(max_blocksize);
+            randblock.resize(max_blocksize);
 
             resizeTable(n);
         }
