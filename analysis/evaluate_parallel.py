@@ -1,9 +1,10 @@
 #!/usr/bin/python3
-import sys, os, re, getopt, numpy, random, argparse
+import sys, os, re, getopt, numpy, random, argparse, math
 import scipy, scipy.stats
 import matplotlib.pyplot as plt
 import subprocess 
 import statistics 
+import itertools
 from matplotlib.backends.backend_pdf import PdfPages
 
 class bcolors:
@@ -36,15 +37,16 @@ def plot_scaling(data):
         weak_scaling = means
         # weak_scaling = [float(means[0])/float(t) for t in means]
         # plt.errorbar(pes, weak_scaling, stdev, marker="^", label="$n/p$=" + str(base))
-        plt.errorbar(pes, weak_scaling, marker="^", label="$n/p$=" + str(base))
+        plt.errorbar(pes, weak_scaling, marker=next(marker), linestyle='-', label=r'$n/P=2^{' + str(int(math.log(base, 2))) + '}$')
 
     plt.grid(True)
-    plt.title(r"Parallel efficiency for $N=2^{30}$ and $N/{np}$ repetitions")
+    plt.title(r"Weak scaling parallel sampling")
+    # plt.title(r"Parallel efficiency for $N=2^{50}$ and $N/{np}$ repetitions")
     # plt.xlabel(r"$\log_{10}$(Sample size)")
     plt.xscale("log", basex=2)
     # plt.yscale("log")
-    plt.xlabel("Number of PEs $p$")
-    plt.ylabel(r"Running time (ns) / $(n/p)$")
+    plt.xlabel("Number of PEs $P$")
+    plt.ylabel(r"Running time / $(n/P)$ (ns)")
     plt.legend(loc=0)
     plt.tight_layout()
     # plt.gca().get_yaxis().get_major_formatter().set_useOffset(False)
@@ -65,9 +67,16 @@ args = parser.parse_args()
 input_file = args.i
 output_file = args.f
 limit = args.l
+# marker = itertools.cycle((".", ",", "o", "v", "^", "+", "x", "d")) 
+marker = itertools.cycle(("o", "v", "x", "d")) 
+linestyle = itertools.cycle(("-", "--", "-.", ":")) 
 print(limit)
 
 # Init plots
+# plt.rc('text', usetex=True)
+# plt.rc('font', family='serif')
+plt.rc('font', serif='cm')
+plt.rc('font', size=13)
 pp = PdfPages(output_file + '.pdf')
 
 # Title

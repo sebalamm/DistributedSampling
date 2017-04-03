@@ -83,6 +83,8 @@ int main(int argn, char **argv) {
                    });
     }
 
+    std::cout << "ss " << sample.size() << std::endl;
+
     std::cout << "measurements" << std::endl;
     for (ULONG iteration = 0; iteration < config.iterations; ++iteration) {
         sample.clear();

@@ -28,10 +28,10 @@ def sample(n, N, k, P, iterations, method):
     out.write("# @ notification = error" + "\n")
     out.write("# @ notify_user = seba.lamm@gmail.com" + "\n")
     out.write("# @ job_type = bluegene" + "\n")
-    out.write("# @ bg_size = " + str(max(32, P)) + "\n")
+    out.write("# @ bg_size = " + str(P/8) + "\n")
     out.write("# @ queue" + "\n")
     out.write("\n") 
-    out.write("runjob --np " + str(P) + " --ranks-per-node 1 : ~/code/build/run_method" + method + " -n " + str(n) + " -N " + str(N) + " -k " + str(k) + " -i " + str(iterations) + " -output " + run_output)
+    out.write("runjob --np " + str(P) + " --ranks-per-node 8 : ~/code/build/run_method" + method + " -n " + str(n) + " -N " + str(N) + " -k " + str(k) + " -i " + str(iterations) + " -output " + run_output)
     out.close()
 
 #######################

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(sampling)
 
-set(CMAKE_CXX_COMPILER g++-5)
-set(CMAKE_C_COMPILER gcc-5)
+set(CMAKE_CXX_COMPILER clang++)
+set(CMAKE_C_COMPILER clang)
 
 if(NOT CMAKE_BUILD_TYPE) 
     set(CMAKE_BUILD_TYPE Release)
@@ -10,7 +10,7 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 find_package(MPI REQUIRED)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -Wall -march=native -O3 -g -std=c++11 -DHAVE_SSE2 -mavx2 -ffast-math")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -DNDEBUG -Wall -march=native -O3 -g -std=c++11 -DHAVE_SSE2 -mavx2 -ffast-math")
 
 include_directories(
     app

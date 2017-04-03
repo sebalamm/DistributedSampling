@@ -26,17 +26,18 @@ def plot_distribution(data):
     print(bcolors.HEADER + "Degree Distribution" + bcolors.ENDC)
     print("##########################")
 
-    [N, n, m] = [2**45, 2**7, 2**44]
+    N_pow = 60
+    [N, n, m] = [2**N_pow, 2**30, 2**(N_pow-1)]
 
     print("Generate hypergeometric distribution...")
-    rv = scipy.stats.hypergeom.rvs(N, n, m, size=10000000)
-    plt.hist(rv, 50, label="Ideal", alpha=0.75)
+    rv = scipy.stats.hypergeom.rvs(N, n, m, size=1000000)
+    plt.hist(rv, 100, normed=1, label="Ideal", alpha=0.5)
 
     print("Generate plot...")
-    plt.hist(data, 50, label="Experiments", alpha=0.75)
+    plt.hist(data, 100, normed=1, label="Experiments", alpha=0.5)
     plt.grid(True)
-    plt.title("Hypergeometric distribution test")
-    plt.xlabel("Hypergeometrix random values")
+    plt.title("Hypergeometric distribution test N=2^" + str(N_pow) + " (No fast math)")
+    plt.xlabel("Hypergeometric random values")
     plt.ylabel("#Occurences")
     plt.legend(loc=0)
     plt.gca().get_yaxis().get_major_formatter().set_useOffset(False)

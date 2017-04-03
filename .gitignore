@@ -32,6 +32,9 @@
 deploy
 optimized
 debug
+build
+*.log
+*.pdf
 config.log
 .sconsign.dblite
 

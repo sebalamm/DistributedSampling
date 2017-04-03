@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import subprocess 
 import statistics 
 from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib import colors
 
 class bcolors:
     HEADER = '\033[95m'
@@ -32,20 +33,23 @@ def plot_scaling(data):
     for alg in sorted(algorithm):
         means = [float(t[2])/int(t[1]) * 1e9 for t in data if t[0] == alg and int(t[1]) >= limit]
         stdev = [float(t[3])/int(t[1]) * 1e9 for t in data if t[0] == alg and int(t[1]) >= limit]
-        ax.errorbar(runs, means, stdev, marker=next(marker), label=r'$' + alg + '$')
+        ax.errorbar(runs, means, stdev, marker=next(marker), linestyle=next(linestyle), fillstyle=next(fillstyle), color=next(color), label=r'$' + alg + '$')
 
     handles, labels = ax.get_legend_handles_labels()
-    new_handles = [handles[2], handles[0], handles[5], handles[3], handles[4], handles[1]]
-    new_labels = [labels[2], labels[0], labels[5], labels[3], labels[4], labels[1]]
-    plt.legend(new_handles, new_labels, loc=2)
+    print(labels)
+    new_handles = [handles[0], handles[3], handles[2], handles[1]]
+    new_labels = [labels[0], labels[3], labels[2], labels[1]]
+    plt.legend(new_handles, new_labels, loc=0, ncol=1)
     plt.grid(True)
-    plt.title(r"Running time for $N=2^{30}$ averaged over $N/n$ repetitions")
+    plt.title(r"Comparison of sequential sampling algorithms")
+    # plt.title(r"Running time for $N=2^{50}$ averaged over $2/n$ repetitions")
     plt.xscale("log", basex=2)
-    # plt.xlabel(r"$\log_{10}$(Sample size)")
+    plt.yscale("log")
+    plt.ylim(ymax=10**2.3, ymin=0.0)
     plt.xlabel("Sample size $n$")
     plt.ylabel("Time per sample (ns)")
-    # plt.ylabel("Cycles per sample")
-    plt.gca().get_yaxis().get_major_formatter().set_useOffset(False)
+    plt.yticks([3, 5, 10, 20, 40, 80, 160])
+    plt.gca().get_yaxis().set_major_formatter(plt.ScalarFormatter())
     plt.tight_layout()
     pp.savefig()
     plt.close()
@@ -67,7 +71,15 @@ limit = args.l
 print(limit)
 
 # Init plots
-marker = itertools.cycle((',', '+', '.', 'o', '*')) 
+marker = itertools.cycle(('^', 'x', 'd', 'o', 'o', '*', 's')) 
+fillstyle = itertools.cycle(('full', 'full', 'none', 'full', 'none', 'full', 'full')) 
+# linestyle = itertools.cycle(("-", "--", "-.", ":")) 
+linestyle = itertools.cycle(("-")) 
+color = itertools.cycle(map(lambda x : colors.cnames[x], ["red", "darkmagenta", "blue", "orange", "green", "darkblue", "darkgreen"])) 
+# plt.rc('text', usetex=True)
+# plt.rc('font', family='serif')
+plt.rc('font', serif='cm')
+plt.rc('font', size=13)
 pp = PdfPages(output_file + '.pdf')
 
 # Title
