@@ -1,9 +1,7 @@
 set(stocc_sources 
     "stoc1.cpp"
     "stoc2.cpp"
-    "stoc3.cpp"
     "userintf.cpp"
-    "fnchyppr.cpp"
 )
 
 set(stocc_headers 
